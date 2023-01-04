@@ -15,5 +15,6 @@
     <modules>
         <module>plugin</module>
         <module>plugin-it</module>
+        <module>http/jdk-http</module>
     </modules>
 </project>
