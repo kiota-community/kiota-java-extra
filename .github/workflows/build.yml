@@ -18,7 +18,3 @@ jobs:
           cache: 'maven'
       - name: Compile
         run: mvn clean install
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.event.inputs.release-version }}
