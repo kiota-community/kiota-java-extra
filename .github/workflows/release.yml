@@ -37,7 +37,7 @@ jobs:
           git commit -m "Release version update ${{ github.event.inputs.release-version }}"
           git push
           git tag ${{ github.event.inputs.release-version }}
-          git push ${{ github.event.inputs.release-version }}
+          git push origin ${{ github.event.inputs.release-version }}
       - name: Back to Snapshot
         run: |
           mvn versions:set -DgenerateBackupPoms=false -DnewVersion=999-SNAPSHOT
