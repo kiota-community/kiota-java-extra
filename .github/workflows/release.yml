@@ -44,5 +44,3 @@ jobs:
           git add .
           git commit -m "Snapshot version update"
           git push
-          git tag ${{ github.event.inputs.release-version }}
-          git push --tags ${{ github.event.inputs.release-version }}
