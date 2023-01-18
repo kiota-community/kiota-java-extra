@@ -30,15 +30,15 @@ jobs:
         run: |
           git config user.name ci-bot
           git config user.email ci-bot@andreatp.io
-      - name: Release
+      - name: Release the new version
         run: |
           mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.release-version }}
           git add .
           git commit -m "Release version update ${{ github.event.inputs.release-version }}"
           git push
           git tag ${{ github.event.inputs.release-version }}
-          git push --tags ${{ github.event.inputs.release-version }}
-      - name: Release
+          git push ${{ github.event.inputs.release-version }}
+      - name: Back to Snapshot
         run: |
           mvn versions:set -DgenerateBackupPoms=false -DnewVersion=999-SNAPSHOT
           git add .
