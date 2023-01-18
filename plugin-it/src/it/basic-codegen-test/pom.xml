@@ -59,7 +59,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.andreatp</groupId>
+                <groupId>com.github.andreaTP.kiota-utils</groupId>
                 <artifactId>kiota-maven-plugin</artifactId>
                 <version>@project.version@</version>
                 <executions>
