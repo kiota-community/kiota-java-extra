@@ -97,6 +97,13 @@ public class JdkHttpRequestAdapter implements com.microsoft.kiota.RequestAdapter
 
     @Nonnull
     @Override
+    public <T> CompletableFuture<T> convertToNativeRequestAsync(@Nonnull RequestInformation requestInfo) {
+        // TODO: to be implemented
+        return null;
+    }
+
+    @Nonnull
+    @Override
     public SerializationWriterFactory getSerializationWriterFactory() {
         return sWriterFactory;
     }
