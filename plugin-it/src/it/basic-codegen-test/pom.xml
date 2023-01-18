@@ -11,33 +11,34 @@
     <properties>
       <maven.compiler.source>@maven.compiler.source@</maven.compiler.source>
       <maven.compiler.target>@maven.compiler.target@</maven.compiler.target>
+      <kiota.libraies.version>0.1.2</kiota.libraies.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-abstractions</artifactId>
-            <version>0.0.11</version>
+            <version>${kiota.libraies.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-http-okHttp</artifactId>
-            <version>0.0.8-SNAPSHOT</version>
+            <version>${kiota.libraies.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-serialization-json</artifactId>
-            <version>0.0.4</version>
+            <version>${kiota.libraies.version}</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-serialization-text</artifactId>
-            <version>0.0.4</version>
+            <version>${kiota.libraies.version}</version>
             </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-serialization-form</artifactId>
-            <version>0.0.1</version>
+            <version>${kiota.libraies.version}</version>
         </dependency>
       
         <dependency>

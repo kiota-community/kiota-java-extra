@@ -1,15 +1,8 @@
 name: Release Workflow
 
 on:
-  workflow_dispatch:
-    inputs:
-      release-version:
-        description: 'Version being released'
-        required: true
-      branch:
-        description: 'Branch to release from'
-        required: true
-        default: 'main'
+  push:
+  pull_request:
 
 jobs:
   release:
