@@ -1,4 +1,4 @@
-package io.apicurio.kiota.http;
+package com.github.andreatp.kiota.http;
 
 import javax.annotation.Nonnull;
 import java.net.http.HttpClient;

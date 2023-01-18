@@ -1,5 +1,6 @@
-package io.apicurio.kiota;
+package com.github.andreatp.kiota;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -8,9 +9,11 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -56,7 +59,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "0.9.0")
+    @Parameter(defaultValue = "0.10.0")
     private String kiotaVersion;
 
     // Kiota Options
@@ -131,35 +134,43 @@ public class KiotaMojo extends AbstractMojo {
     public void execute() {
         KiotaParams kp = new KiotaParams(osName, osArch);
 
-        downloadAndExtract(baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip", targetBinaryFolder.getAbsolutePath(), kp);
+        String executablePath = Path.of(targetBinaryFolder.getAbsolutePath(), kiotaVersion).toFile().getAbsolutePath();
 
-        executeKiota(Paths.get(targetBinaryFolder.getAbsolutePath(), kp.binary()).toFile());
+        downloadAndExtract(baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip", executablePath, kp);
+
+        File executableFile = Paths.get(executablePath, kp.binary()).toFile();
+        executeKiota(executableFile);
+        injectDependencies(executableFile);
     }
 
-    private void executeKiota(File binary) {
-        List<String> cmd = new ArrayList<>();
-        cmd.add(binary.getAbsolutePath());
-        cmd.add("generate");
-        // process command line options
-        cmd.add("--openapi"); cmd.add(openapiSpec.getAbsolutePath());
-        cmd.add("--output"); cmd.add(targetDirectory.getAbsolutePath());
-        cmd.add("--language"); cmd.add(language);
-        cmd.add("--class-name"); cmd.add(clientClass);
-        cmd.add("--namespace-name"); cmd.add(namespace);
-        cmd.add("--clean-output"); cmd.add(cleanOutput);
-        cmd.add("--clear-cache"); cmd.add(clearCache);
-        cmd.add("--log-level"); cmd.add(kiotaLogLevel);
-
+    private String runProcess(List<String> cmd, boolean returnOutput) {
         log.info("Going to execute the command: " + cmd.stream().collect(Collectors.joining(" ")));
         Process ps = null;
         try {
             ProcessBuilder pb = new ProcessBuilder(cmd);
             pb.directory(new File("."));
-            pb.inheritIO();
+
+            if (!returnOutput) {
+                pb.inheritIO();
+            }
             ps = pb.start();
             ps.waitFor(kiotaTimeout, TimeUnit.SECONDS);
-            if (ps.exitValue() != 0) {
-                throw new RuntimeException("Error executing the Kiota command, return code is " + ps.exitValue());
+
+            if (returnOutput) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
+                StringBuilder sb = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) sb.append(line);
+
+                if (ps.exitValue() != 0) {
+                    throw new RuntimeException("Error executing the Kiota command, return code is " + ps.exitValue());
+                }
+
+                String result = sb.toString();
+                log.info("Returned output is: " + result);
+                return result;
+            } else {
+                return null;
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to execute kiota", e);
@@ -181,9 +192,47 @@ public class KiotaMojo extends AbstractMojo {
                 }
             }
         }
+    }
 
+    private void executeKiota(File binary) {
+        List<String> cmd = new ArrayList<>();
+        cmd.add(binary.getAbsolutePath());
+        cmd.add("generate");
+        // process command line options
+        cmd.add("--openapi"); cmd.add(openapiSpec.getAbsolutePath());
+        cmd.add("--output"); cmd.add(targetDirectory.getAbsolutePath());
+        cmd.add("--language"); cmd.add(language);
+        cmd.add("--class-name"); cmd.add(clientClass);
+        cmd.add("--namespace-name"); cmd.add(namespace);
+        cmd.add("--clean-output"); cmd.add(cleanOutput);
+        cmd.add("--clear-cache"); cmd.add(clearCache);
+        cmd.add("--log-level"); cmd.add(kiotaLogLevel);
+
+        runProcess(cmd, false);
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
+
+    private void injectDependencies(File binary) {
+        List<String> cmd = new ArrayList<>();
+        cmd.add(binary.getAbsolutePath());
+        cmd.add("info");
+        cmd.add("--language"); cmd.add(language);
+
+        String infoOutputCmd = runProcess(cmd, true);
+
+//        log.warn("On from here " + infoOutputCmd);
+
+//        Dependency dependency = new Dependency();
+//        dependency.setArtifactId(a.getArtifactId());
+//        dependency.setGroupId(a.getGroupId());
+//        dependency.setVersion(a.getVersion());
+//        dependency.setScope(a.getScope());
+//        dependency.setType(a.getType());
+//        dependency.setClassifier(a.getClassifier());
+//        project.getRuntimeDependencies().add()
+//        project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
+    }
+
 
     private void downloadAndExtract(String url, String dest, KiotaParams kp) {
         try {

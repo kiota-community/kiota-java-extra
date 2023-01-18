@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.apicurio.kiota.tests;
+package com.github.andreatp.kiota.tests;
 
 import org.junit.Test;
 

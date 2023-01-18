@@ -1,4 +1,4 @@
-package io.apicurio.kiota.http;
+package com.github.andreatp.kiota.http;
 
 import com.microsoft.kiota.ApiClientBuilder;
 import com.microsoft.kiota.ApiException;
