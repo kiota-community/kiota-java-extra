@@ -24,7 +24,9 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       - name: Compile
-        run: mvn clean install
+        run: |
+          mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ github.event.inputs.release-version }}
+          mvn clean install
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
