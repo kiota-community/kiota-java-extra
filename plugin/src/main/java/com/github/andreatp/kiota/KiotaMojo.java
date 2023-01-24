@@ -175,6 +175,7 @@ public class KiotaMojo extends AbstractMojo {
     }
 
     private File downloadSpec(URL url) {
+        downloadTarget.mkdirs();
         final File finalDestination = new File(downloadTarget, new File(url.getFile()).getName());
         if (finalDestination.exists()) {
             log.warn("Skipping download of " + url + " because it already exists at " + finalDestination);
