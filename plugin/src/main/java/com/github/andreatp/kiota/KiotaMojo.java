@@ -1,6 +1,5 @@
 package com.github.andreatp.kiota;
 
-import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -53,21 +52,36 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Base URL to be used for the download
      */
-    @Parameter(defaultValue = "https://github.com/microsoft/kiota/releases/download")
+    // @Parameter(defaultValue = "https://github.com/microsoft/kiota/releases/download")
+    @Parameter(defaultValue = "https://github.com/andreaTP/kiota/releases/download")
     private String baseURL;
 
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "0.10.0")
+    // @Parameter(defaultValue = "0.10.0")
+    @Parameter(defaultValue = "0.11.0-preview")
     private String kiotaVersion;
 
     // Kiota Options
     /**
-     * The openapi specification to be used for generating code
+     * The openapi specifications to be used for generating code
      */
     @Parameter(defaultValue = "${basedir}/src/main/resources/openapi.json")
-    private File openapiSpec;
+    private File[] files;
+
+    /**
+     * The URL to be used to download an API spect from a remote locations
+     */
+    @Parameter()
+    URL[] urls;
+
+    /**
+     * The Download target folder for CRDs downloaded from remote URLs
+     *
+     */
+    @Parameter(defaultValue = "${basedir}/target/openapi-spec")
+    File downloadTarget;
 
     /**
      * Location where to generate the Java code
@@ -139,8 +153,40 @@ public class KiotaMojo extends AbstractMojo {
         downloadAndExtract(baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip", executablePath, kp);
 
         File executableFile = Paths.get(executablePath, kp.binary()).toFile();
-        executeKiota(executableFile);
-        injectDependencies(executableFile);
+
+        // Collect all the specifications
+        List<File> openApis = new ArrayList<>();
+        if (files != null) {
+            for (var file : files) {
+                openApis.add(new File(file.getAbsolutePath()));
+            }
+        }
+        if (urls != null) {
+            for (var url : urls) {
+                openApis.add(downloadSpec(url));
+            }
+        }
+
+        // Run Kiota on the specs
+        for (var openApi: openApis) {
+            executeKiota(executableFile, openApi);
+            injectDependencies(executableFile, openApi);
+        }
+    }
+
+    private File downloadSpec(URL url) {
+        final File finalDestination = new File(downloadTarget, new File(url.getFile()).getName());
+        if (finalDestination.exists()) {
+            log.warn("Skipping download of " + url + " because it already exists at " + finalDestination);
+            return finalDestination;
+        }
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
+             FileOutputStream fileOutputStream = new FileOutputStream(finalDestination)) {
+            fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            return finalDestination;
+        } catch (IOException e) {
+            throw new IllegalArgumentException("Error downloading OpenAPI from URL: " + url, e);
+        }
     }
 
     private String runProcess(List<String> cmd, boolean returnOutput) {
@@ -194,12 +240,12 @@ public class KiotaMojo extends AbstractMojo {
         }
     }
 
-    private void executeKiota(File binary) {
+    private void executeKiota(File binary, File openApiSpec) {
         List<String> cmd = new ArrayList<>();
         cmd.add(binary.getAbsolutePath());
         cmd.add("generate");
         // process command line options
-        cmd.add("--openapi"); cmd.add(openapiSpec.getAbsolutePath());
+        cmd.add("--openapi"); cmd.add(openApiSpec.getAbsolutePath());
         cmd.add("--output"); cmd.add(targetDirectory.getAbsolutePath());
         cmd.add("--language"); cmd.add(language);
         cmd.add("--class-name"); cmd.add(clientClass);
@@ -212,7 +258,7 @@ public class KiotaMojo extends AbstractMojo {
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
 
-    private void injectDependencies(File binary) {
+    private void injectDependencies(File binary, File openApiSpec) {
         List<String> cmd = new ArrayList<>();
         cmd.add(binary.getAbsolutePath());
         cmd.add("info");
