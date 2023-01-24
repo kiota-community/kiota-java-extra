@@ -67,7 +67,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * The openapi specifications to be used for generating code
      */
-    @Parameter(defaultValue = "${basedir}/src/main/resources/openapi.json")
+    @Parameter()
     private File[] files;
 
     /**

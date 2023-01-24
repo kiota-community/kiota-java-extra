@@ -70,6 +70,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <files>${basedir}/src/main/resources/openapi.json</files>
+                </configuration>
             </plugin>
         </plugins>
     </build>
