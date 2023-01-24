@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.github.andreaTP.kiota-utils</groupId>
         <artifactId>kiota-utils-parent</artifactId>
-        <version>0.0.10-SNAPSHOT</version>
+        <version>999-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>kiota-maven-plugin</artifactId>
-    <version>0.0.10-SNAPSHOT</version>
+    <version>999-SNAPSHOT</version>
     <packaging>maven-plugin</packaging>
     
     <description>A Maven plugin to generate code with Kiota</description>
