@@ -79,12 +79,6 @@ public class KiotaMojo extends AbstractMojo {
     URL url;
 
     /**
-     * Inject default dependencies inferred from the CLI
-     */
-    @Parameter(defaultValue = "true")
-    boolean injectDependencies;
-
-    /**
      * The Download target folder for CRDs downloaded from remote URLs
      *
      */
@@ -180,9 +174,7 @@ public class KiotaMojo extends AbstractMojo {
 
         executeKiota(executableFile, openApiSpec);
         // TODO verify how this mechanism can work with: https://github.com/microsoft/OpenAPI/blob/master/extensions/x-kiota-info.md
-        if (injectDependencies) {
-            injectDependencies(executableFile, openApiSpec);
-        }
+        checkDependencies(executableFile, openApiSpec);
     }
 
     private File downloadSpec(URL url) {
@@ -221,6 +213,7 @@ public class KiotaMojo extends AbstractMojo {
                 String line;
                 while ((line = br.readLine()) != null) sb.append(line + NEW_LINE);
 
+                // TODO: Seems like we are not interrupting the Maven build when something breaks
                 if (ps.exitValue() != 0) {
                     throw new RuntimeException("Error executing the Kiota command, return code is " + ps.exitValue());
                 }
@@ -274,7 +267,7 @@ public class KiotaMojo extends AbstractMojo {
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
 
-    private void injectDependencies(File binary, File openApiSpec) {
+    private void checkDependencies(File binary, File openApiSpec) {
         List<String> cmd = new ArrayList<>();
         cmd.add(binary.getAbsolutePath());
         cmd.add("info");
@@ -292,7 +285,6 @@ public class KiotaMojo extends AbstractMojo {
         Dependency dependencyPrototype = new Dependency();
         dependencyPrototype.setGroupId("com.microsoft.kiota");
         dependencyPrototype.setVersion(libraryVersion);
-        dependencyPrototype.setScope("runtime");
 
         Dependency abstractions = dependencyPrototype.clone();
         abstractions.setArtifactId("microsoft-kiota-abstractions");
@@ -311,13 +303,33 @@ public class KiotaMojo extends AbstractMojo {
         findbugs.setArtifactId("jsr305");
         findbugs.setVersion("3.0.0");
 
-        List<Dependency> deps = new ArrayList(project.getDependencies());
-        deps.add(abstractions);
-        deps.add(serializationJson);
-        deps.add(serializationText);
-        deps.add(serializationForm);
-        deps.add(findbugs);
-        project.setDependencies(deps);
+        List<Dependency> needed = new ArrayList<>();
+        needed.add(abstractions);
+        needed.add(serializationJson);
+        needed.add(serializationText);
+        needed.add(serializationForm);
+        needed.add(findbugs);
+
+        for (Object o: project.getDependencies()) {
+            Dependency d = (Dependency) o;
+            needed.removeIf(n ->
+                    d.getGroupId().equals(n.getGroupId()) &&
+                    d.getArtifactId().equals(n.getArtifactId()) &&
+                    d.getVersion().equals(n.getVersion()));
+        }
+
+        if (!needed.isEmpty()) {
+            log.warn("Found missing dependencies, please add the following to your pom.xml:");
+            for (Dependency d: needed) {
+                log.warn("<dependency>");
+                log.warn("  <groupId>" + d.getGroupId() + "</groupId>");
+                log.warn("  <artifactId>" + d.getArtifactId() + "</artifactId>");
+                log.warn("  <version>" + d.getVersion() + "</version>");
+                log.warn("</dependency>");
+            }
+        } else {
+            log.info("Detected dependencies are aligned.");
+        }
     }
 
 
