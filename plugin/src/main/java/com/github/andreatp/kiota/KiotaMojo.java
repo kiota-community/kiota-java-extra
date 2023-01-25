@@ -1,5 +1,6 @@
 package com.github.andreatp.kiota;
 
+import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -22,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +62,7 @@ public class KiotaMojo extends AbstractMojo {
      * Version of Kiota to be used
      */
     // @Parameter(defaultValue = "0.10.0")
-    @Parameter(defaultValue = "0.11.1-preview")
+    @Parameter(defaultValue = "0.11.2-preview")
     private String kiotaVersion;
 
     // Kiota Options
@@ -75,6 +77,12 @@ public class KiotaMojo extends AbstractMojo {
      */
     @Parameter()
     URL url;
+
+    /**
+     * Inject default dependencies inferred from the CLI
+     */
+    @Parameter(defaultValue = "true")
+    boolean injectDependencies;
 
     /**
      * The Download target folder for CRDs downloaded from remote URLs
@@ -144,6 +152,11 @@ public class KiotaMojo extends AbstractMojo {
     @Parameter(property = "project", required = true, readonly = true)
     private MavenProject project;
 
+    // Used only internally
+    private final static String NEW_LINE = "\n";
+    // TODO, evaluate if we should make this configurable
+    private final String infoMatchPrefix = "com.microsoft.kiota:microsoft-kiota-abstractions:";
+
     @Override
     public void execute() {
         KiotaParams kp = new KiotaParams(osName, osArch);
@@ -166,7 +179,10 @@ public class KiotaMojo extends AbstractMojo {
         }
 
         executeKiota(executableFile, openApiSpec);
-        injectDependencies(executableFile, openApiSpec);
+        // TODO verify how this mechanism can work with: https://github.com/microsoft/OpenAPI/blob/master/extensions/x-kiota-info.md
+        if (injectDependencies) {
+            injectDependencies(executableFile, openApiSpec);
+        }
     }
 
     private File downloadSpec(URL url) {
@@ -193,7 +209,7 @@ public class KiotaMojo extends AbstractMojo {
             pb.directory(new File("."));
 
             if (!returnOutput) {
-                // TODO: STDERR seems to not be redirected
+                // TODO: STDERR is not correctly redirected
                 pb.inheritIO();
             }
             ps = pb.start();
@@ -203,14 +219,14 @@ public class KiotaMojo extends AbstractMojo {
                 BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
-                while ((line = br.readLine()) != null) sb.append(line);
+                while ((line = br.readLine()) != null) sb.append(line + NEW_LINE);
 
                 if (ps.exitValue() != 0) {
                     throw new RuntimeException("Error executing the Kiota command, return code is " + ps.exitValue());
                 }
 
                 String result = sb.toString();
-                log.info("Returned output is: " + result);
+                log.info("Returned output is:\n" + result);
                 return result;
             } else {
                 return null;
@@ -265,16 +281,43 @@ public class KiotaMojo extends AbstractMojo {
         cmd.add("--language"); cmd.add(language);
 
         String infoOutputCmd = runProcess(cmd, true);
+        String libraryVersion = Arrays.stream(infoOutputCmd.split(NEW_LINE))
+                .filter(l -> l.startsWith(infoMatchPrefix))
+                .map(l -> l.replace(infoMatchPrefix, ""))
+                .findFirst()
+                .get();
 
-//        log.warn("On from here " + infoOutputCmd);
-//        Dependency dependency = new Dependency();
-//        dependency.setArtifactId(a.getArtifactId());
-//        dependency.setGroupId(a.getGroupId());
-//        dependency.setVersion(a.getVersion());
-//        dependency.setScope(a.getScope());
-//        dependency.setType(a.getType());
-//        dependency.setClassifier(a.getClassifier());
-//        project.getRuntimeDependencies().add()
+        log.info("Kiota dependencies version detected is " + libraryVersion);
+
+        Dependency dependencyPrototype = new Dependency();
+        dependencyPrototype.setGroupId("com.microsoft.kiota");
+        dependencyPrototype.setVersion(libraryVersion);
+        dependencyPrototype.setScope("runtime");
+
+        Dependency abstractions = dependencyPrototype.clone();
+        abstractions.setArtifactId("microsoft-kiota-abstractions");
+
+        Dependency serializationJson = dependencyPrototype.clone();
+        serializationJson.setArtifactId("microsoft-kiota-serialization-json");
+
+        Dependency serializationText = dependencyPrototype.clone();
+        serializationText.setArtifactId("microsoft-kiota-serialization-text");
+
+        Dependency serializationForm = dependencyPrototype.clone();
+        serializationForm.setArtifactId("microsoft-kiota-serialization-form");
+
+        Dependency findbugs = new Dependency();
+        findbugs.setGroupId("com.google.code.findbugs");
+        findbugs.setArtifactId("jsr305");
+        findbugs.setVersion("3.0.0");
+
+        List<Dependency> deps = new ArrayList(project.getDependencies());
+        deps.add(abstractions);
+        deps.add(serializationJson);
+        deps.add(serializationText);
+        deps.add(serializationForm);
+        deps.add(findbugs);
+        project.setDependencies(deps);
     }
 
 
