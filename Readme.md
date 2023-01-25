@@ -1,8 +1,11 @@
 # Utilities to work with Kiota
 
+[![](https://jitpack.io/v/andreaTP/kiota-utils.svg)](https://jitpack.io/#andreaTP/kiota-utils)
+
 This is still highly experimental, expects changes any time.
 
 ## TODO
 
-- tight up the Kiota version
-- tight up the Kiota libraries versions
+- find a good way to set a Kiota version (java-template?)
+- parse the info command to get Kiota libraries versions
+- combine Kiota libraries versions with RH provided additional libs (e.g. `kiota-rh-auth`)
