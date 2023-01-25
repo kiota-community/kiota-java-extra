@@ -71,7 +71,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <files>${basedir}/src/main/resources/openapi.json</files>
+                    <file>${basedir}/src/main/resources/openapi.json</file>
                 </configuration>
             </plugin>
         </plugins>

@@ -16,5 +16,6 @@
         <module>plugin</module>
         <module>plugin-it</module>
         <module>http/jdk-http</module>
+        <module>rh-auth</module>
     </modules>
 </project>

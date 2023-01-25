@@ -38,6 +38,10 @@ jobs:
           git push
           git tag ${{ github.event.inputs.release-version }}
           git push origin ${{ github.event.inputs.release-version }}
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.inputs.release-version }}
       - name: Back to Snapshot
         run: |
           mvn versions:set -DgenerateBackupPoms=false -DnewVersion=999-SNAPSHOT

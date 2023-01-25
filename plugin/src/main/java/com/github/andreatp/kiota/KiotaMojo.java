@@ -65,16 +65,16 @@ public class KiotaMojo extends AbstractMojo {
 
     // Kiota Options
     /**
-     * The openapi specifications to be used for generating code
+     * The openapi specification to be used for generating code
      */
     @Parameter()
-    private File[] files;
+    private File file;
 
     /**
-     * The URL to be used to download an API spect from a remote locations
+     * The URL to be used to download an API spec from a remote location
      */
     @Parameter()
-    URL[] urls;
+    URL url;
 
     /**
      * The Download target folder for CRDs downloaded from remote URLs
@@ -154,24 +154,19 @@ public class KiotaMojo extends AbstractMojo {
 
         File executableFile = Paths.get(executablePath, kp.binary()).toFile();
 
-        // Collect all the specifications
-        List<File> openApis = new ArrayList<>();
-        if (files != null) {
-            for (var file : files) {
-                openApis.add(new File(file.getAbsolutePath()));
-            }
-        }
-        if (urls != null) {
-            for (var url : urls) {
-                openApis.add(downloadSpec(url));
-            }
+        File openApiSpec = null;
+        if (file == null && url == null) {
+            throw new IllegalArgumentException("Please provide one of a file or a url.");
+        } else if (file != null && url != null) {
+            throw new IllegalArgumentException("Please provide ONLY one of a file or a url.");
+        } else if (file != null) {
+            openApiSpec = new File(file.getAbsolutePath());
+        } else if (url != null) {
+            openApiSpec = downloadSpec(url);
         }
 
-        // Run Kiota on the specs
-        for (var openApi: openApis) {
-            executeKiota(executableFile, openApi);
-            injectDependencies(executableFile, openApi);
-        }
+        executeKiota(executableFile, openApiSpec);
+        injectDependencies(executableFile, openApiSpec);
     }
 
     private File downloadSpec(URL url) {
@@ -198,6 +193,7 @@ public class KiotaMojo extends AbstractMojo {
             pb.directory(new File("."));
 
             if (!returnOutput) {
+                // TODO: STDERR seems to not be redirected
                 pb.inheritIO();
             }
             ps = pb.start();
@@ -242,6 +238,9 @@ public class KiotaMojo extends AbstractMojo {
     }
 
     private void executeKiota(File binary, File openApiSpec) {
+        if (!openApiSpec.exists()) {
+            throw new IllegalArgumentException("Spec file not found on the path: " + openApiSpec.getAbsolutePath());
+        }
         List<String> cmd = new ArrayList<>();
         cmd.add(binary.getAbsolutePath());
         cmd.add("generate");
