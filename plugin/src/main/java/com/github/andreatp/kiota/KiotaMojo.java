@@ -60,7 +60,7 @@ public class KiotaMojo extends AbstractMojo {
      * Version of Kiota to be used
      */
     // @Parameter(defaultValue = "0.10.0")
-    @Parameter(defaultValue = "0.11.0-preview")
+    @Parameter(defaultValue = "0.11.1-preview")
     private String kiotaVersion;
 
     // Kiota Options
@@ -267,7 +267,6 @@ public class KiotaMojo extends AbstractMojo {
         String infoOutputCmd = runProcess(cmd, true);
 
 //        log.warn("On from here " + infoOutputCmd);
-
 //        Dependency dependency = new Dependency();
 //        dependency.setArtifactId(a.getArtifactId());
 //        dependency.setGroupId(a.getGroupId());
@@ -276,7 +275,6 @@ public class KiotaMojo extends AbstractMojo {
 //        dependency.setType(a.getType());
 //        dependency.setClassifier(a.getClassifier());
 //        project.getRuntimeDependencies().add()
-//        project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
 
 
