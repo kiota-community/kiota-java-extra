@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.andreaTP.kiota-utils</groupId>
         <artifactId>kiota-utils-parent</artifactId>
-        <version>0.1.3</version>
+        <version>999-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
