@@ -207,17 +207,19 @@ public class KiotaMojo extends AbstractMojo {
             ps = pb.start();
             ps.waitFor(kiotaTimeout, TimeUnit.SECONDS);
 
+            if (ps.exitValue() != 0) {
+                throw new RuntimeException("Error executing the Kiota command, exit code is " + ps.exitValue());
+            }
+            File kiotaLockFile = new File(targetDirectory, "kiota-lock.json");
+            if (!kiotaLockFile.exists()) {
+                throw new RuntimeException("Error executing the Kiota command, no output found, cannot find the generated lock file.");
+            }
+
             if (returnOutput) {
                 BufferedReader br = new BufferedReader(new InputStreamReader(ps.getInputStream()));
                 StringBuilder sb = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) sb.append(line + NEW_LINE);
-
-                // TODO: Seems like we are not interrupting the Maven build when something breaks
-                if (ps.exitValue() != 0) {
-                    throw new RuntimeException("Error executing the Kiota command, return code is " + ps.exitValue());
-                }
-
                 String result = sb.toString();
                 log.info("Returned output is:\n" + result);
                 return result;
