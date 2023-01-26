@@ -29,13 +29,13 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     private String lastRefreshToken = null;
 
 
-    RHAccessTokenProvider(String offline_token) {
+    public RHAccessTokenProvider(String offline_token) {
         this.offline_token = offline_token;
         this.url = RH_SSO_URL;
         this.allowedHosts = new String[] { "sso.redhat.com" };
     }
 
-    RHAccessTokenProvider(String offline_token, String url, String[] allowedHosts) {
+    public RHAccessTokenProvider(String offline_token, String url, String[] allowedHosts) {
         this.offline_token = offline_token;
         this.url = url;
         this.allowedHosts = allowedHosts;

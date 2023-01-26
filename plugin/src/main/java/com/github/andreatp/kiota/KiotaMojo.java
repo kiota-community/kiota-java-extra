@@ -157,6 +157,7 @@ public class KiotaMojo extends AbstractMojo {
 
         String executablePath = Path.of(targetBinaryFolder.getAbsolutePath(), kiotaVersion).toFile().getAbsolutePath();
 
+        // TODO: Use a system wide installation of Kiota if available?
         downloadAndExtract(baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip", executablePath, kp);
 
         File executableFile = Paths.get(executablePath, kp.binary()).toFile();
