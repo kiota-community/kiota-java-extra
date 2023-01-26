@@ -8,3 +8,4 @@ This is still highly experimental, expects changes any time.
 
 - find a good way to set a Kiota version (java-template?)
 - combine Kiota libraries versions with RH provided additional libs (e.g. `kiota-rh-auth`)?
+- produce a BOM with aggregated Kiota libraries and RH libs
