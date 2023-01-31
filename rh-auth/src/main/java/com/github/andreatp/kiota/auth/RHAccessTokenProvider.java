@@ -14,64 +14,87 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class RHAccessTokenProvider implements AccessTokenProvider {
     // https://access.redhat.com/articles/3626371
 
     public final static String RH_SSO_URL = "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token";
+    public final static String RH_SSO_CLIENT_ID = "rhsm-api";
 
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
     private final String url;
+    private final String clientId;
     private final String[] allowedHosts;
     private final String offline_token;
+    private final long refreshBeforeMillis = 1000;
 
-    private String lastRefreshToken = null;
-
+    private AtomicReference<String> lastRefreshToken = new AtomicReference<>(null);
+    private AtomicReference<CountDownLatch> refreshTokenCountDown = new AtomicReference<>(new CountDownLatch(0));
 
     public RHAccessTokenProvider(String offline_token) {
         this.offline_token = offline_token;
         this.url = RH_SSO_URL;
+        this.clientId = RH_SSO_CLIENT_ID;
         this.allowedHosts = new String[] { "sso.redhat.com" };
     }
 
-    public RHAccessTokenProvider(String offline_token, String url, String[] allowedHosts) {
+    public RHAccessTokenProvider(String offline_token, String url, String clientId, String[] allowedHosts) {
         this.offline_token = offline_token;
         this.url = url;
+        this.clientId = clientId;
         this.allowedHosts = allowedHosts;
     }
 
-    private String newToken() {
-        var data = new FormBody.Builder()
-                .add("grant_type", "refresh_token")
-                .add("client_id", "rhsm-api")
-                .add("refresh_token", offline_token)
-                .build();
+    private boolean needsRefresh() {
+        return (lastRefreshToken.get() == null ||
+                JWT
+                        .decode(lastRefreshToken.get())
+                        .getExpiresAtAsInstant()
+                        .plusMillis(refreshBeforeMillis)
+                        .isBefore(Instant.now()));
+    }
 
-        var request = new Request.Builder()
-                .url(url)
-                .post(data)
-                .build();
+    private void newToken() {
+        if (refreshTokenCountDown.compareAndSet(new CountDownLatch(0), new CountDownLatch(1))) {
+            if (needsRefresh()) {
+                var data = new FormBody.Builder()
+                        .add("grant_type", "refresh_token")
+                        .add("client_id", clientId)
+                        .add("refresh_token", offline_token)
+                        .build();
 
-        String token = null;
-        try {
-            var response = client.newCall(request).execute();
-            token = mapper.readTree(response.body().string()).get("access_token").asText();
-        } catch (IOException e) {
-            throw new RuntimeException("Error issuing a new token", e);
+                var request = new Request.Builder()
+                        .url(url)
+                        .post(data)
+                        .build();
+
+                String token = null;
+                try {
+                    var response = client.newCall(request).execute();
+                    token = mapper.readTree(response.body().string()).get("access_token").asText();
+                } catch (IOException e) {
+                    throw new RuntimeException("Error issuing a new token", e);
+                }
+
+                lastRefreshToken.set(token);
+            }
+            refreshTokenCountDown.get().countDown();
         }
-
-        lastRefreshToken = token;
-        return token;
     }
 
     @Override
     public CompletableFuture<String> getAuthorizationToken(URI uri, @Nullable Map<String, Object> additionalAuthenticationContext) {
-        if (lastRefreshToken == null || JWT.decode(lastRefreshToken).getExpiresAtAsInstant().plusMillis(1000).isBefore(Instant.now())) {
-            newToken();
-        }
+        newToken();
 
-        return CompletableFuture.completedFuture(lastRefreshToken);
+        try {
+            refreshTokenCountDown.get().await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return CompletableFuture.completedFuture(lastRefreshToken.get());
     }
 
     @Override
