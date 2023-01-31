@@ -64,31 +64,34 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
 
     private void newToken() {
         if (isRefreshing.compareAndSet(false, true)) {
-            if (needsRefresh()) {
-                refreshTokenCountDown.set(new CountDownLatch(1));
-                var data = new FormBody.Builder()
-                        .add("grant_type", "refresh_token")
-                        .add("client_id", clientId)
-                        .add("refresh_token", offline_token)
-                        .build();
+            try {
+                if (needsRefresh()) {
+                    refreshTokenCountDown.set(new CountDownLatch(1));
+                    var data = new FormBody.Builder()
+                            .add("grant_type", "refresh_token")
+                            .add("client_id", clientId)
+                            .add("refresh_token", offline_token)
+                            .build();
 
-                var request = new Request.Builder()
-                        .url(url)
-                        .post(data)
-                        .build();
+                    var request = new Request.Builder()
+                            .url(url)
+                            .post(data)
+                            .build();
 
-                String token = null;
-                try {
-                    var response = client.newCall(request).execute();
-                    token = mapper.readTree(response.body().string()).get("access_token").asText();
-                } catch (IOException e) {
-                    throw new RuntimeException("Error issuing a new token", e);
+                    String token = null;
+                    try {
+                        var response = client.newCall(request).execute();
+                        token = mapper.readTree(response.body().string()).get("access_token").asText();
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error issuing a new token", e);
+                    }
+
+                    lastRefreshToken.set(token);
+                    refreshTokenCountDown.get().countDown();
                 }
-
-                lastRefreshToken.set(token);
-                refreshTokenCountDown.get().countDown();
+            } finally {
+                isRefreshing.set(false);
             }
-            isRefreshing.set(false);
         }
     }
 
