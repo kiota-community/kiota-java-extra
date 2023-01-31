@@ -13,8 +13,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class RHAccessTokenProvider implements AccessTokenProvider {
@@ -32,9 +34,11 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     private final long refreshBeforeMillis = 1000;
 
     private AtomicReference<String> lastRefreshToken = new AtomicReference<>(null);
+    private AtomicBoolean isRefreshing = new AtomicBoolean(false);
     private AtomicReference<CountDownLatch> refreshTokenCountDown = new AtomicReference<>(new CountDownLatch(0));
 
     public RHAccessTokenProvider(String offline_token) {
+        Objects.requireNonNull(offline_token);
         this.offline_token = offline_token;
         this.url = RH_SSO_URL;
         this.clientId = RH_SSO_CLIENT_ID;
@@ -42,6 +46,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     }
 
     public RHAccessTokenProvider(String offline_token, String url, String clientId, String[] allowedHosts) {
+        Objects.requireNonNull(offline_token);
         this.offline_token = offline_token;
         this.url = url;
         this.clientId = clientId;
@@ -58,8 +63,9 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     }
 
     private void newToken() {
-        if (refreshTokenCountDown.compareAndSet(new CountDownLatch(0), new CountDownLatch(1))) {
+        if (isRefreshing.compareAndSet(false, true)) {
             if (needsRefresh()) {
+                refreshTokenCountDown.set(new CountDownLatch(1));
                 var data = new FormBody.Builder()
                         .add("grant_type", "refresh_token")
                         .add("client_id", clientId)
@@ -80,21 +86,23 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
                 }
 
                 lastRefreshToken.set(token);
+                refreshTokenCountDown.get().countDown();
             }
-            refreshTokenCountDown.get().countDown();
+            isRefreshing.set(false);
         }
     }
 
     @Override
     public CompletableFuture<String> getAuthorizationToken(URI uri, @Nullable Map<String, Object> additionalAuthenticationContext) {
-        newToken();
-
-        try {
-            refreshTokenCountDown.get().await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return CompletableFuture.completedFuture(lastRefreshToken.get());
+        return CompletableFuture.supplyAsync(() -> {
+            newToken();
+            try {
+                refreshTokenCountDown.get().await();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return lastRefreshToken.get();
+        });
     }
 
     @Override
