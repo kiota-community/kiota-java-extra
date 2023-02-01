@@ -1,6 +1,7 @@
 package com.github.andreatp.kiota.auth;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.microsoft.kiota.authentication.AccessTokenProvider;
 import com.microsoft.kiota.authentication.AllowedHostsValidator;
@@ -9,9 +10,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -22,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class RHAccessTokenProvider implements AccessTokenProvider {
     // https://access.redhat.com/articles/3626371
 
+    public final static String SSO_TOKEN_PATH = "/protocol/openid-connect/token";
     public final static String RH_SSO_URL = "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token";
     public final static String RH_SSO_CLIENT_ID = "cloud-services"; // or "rhsm-api"
 
@@ -40,10 +43,25 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     public RHAccessTokenProvider(String offline_token) {
         Objects.requireNonNull(offline_token);
         this.offline_token = offline_token;
-        // Obtain those informations from the offline token JWT payload?
-        this.url = RH_SSO_URL;
-        this.clientId = RH_SSO_CLIENT_ID;
-        this.allowedHosts = new String[] { "sso.redhat.com" };
+        String url = RH_SSO_URL;
+        String clientId = RH_SSO_CLIENT_ID;
+        String[] allowedHosts = new String[] { "sso.redhat.com" };
+        try {
+            DecodedJWT decoded = JWT.decode(offline_token);
+            String issuer = decoded.getIssuer();
+            String allowedHost = URI.create(issuer).getHost();
+            url = issuer + SSO_TOKEN_PATH;
+            allowedHosts = new String[] { allowedHost };
+
+            String payload = new String(Base64.getDecoder().decode(decoded.getPayload()), StandardCharsets.UTF_8);
+            clientId = mapper.readTree(payload).get("azp").textValue();
+        } catch (Exception e) {
+            // ignore: fallback to static defaults
+        }
+
+        this.url = url;
+        this.allowedHosts = allowedHosts;
+        this.clientId = clientId;
     }
 
     public RHAccessTokenProvider(String offline_token, String url, String clientId, String[] allowedHosts) {
@@ -82,9 +100,18 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
                     String token = null;
                     try {
                         var response = client.newCall(request).execute();
-                        // More checks and a better error handling (currently it throws null pointer)
-                        token = mapper.readTree(response.body().string()).get("access_token").asText();
-                    } catch (IOException e) {
+                        var code = response.code();
+                        if (code == 200) {
+                            var body = response.body().string();
+                            try {
+                                token = mapper.readTree(body).get("access_token").asText();
+                            } catch (Exception e) {
+                                throw new RuntimeException("Error issuing a new token, received answer with body " + body, e);
+                            }
+                        } else {
+                            throw new RuntimeException("Error issuing a new token, received answer code " + code);
+                        }
+                    } catch (Exception e) {
                         throw new RuntimeException("Error issuing a new token", e);
                     }
 
