@@ -40,6 +40,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     public RHAccessTokenProvider(String offline_token) {
         Objects.requireNonNull(offline_token);
         this.offline_token = offline_token;
+        // Obtain those informations from the offline token JWT payload?
         this.url = RH_SSO_URL;
         this.clientId = RH_SSO_CLIENT_ID;
         this.allowedHosts = new String[] { "sso.redhat.com" };
