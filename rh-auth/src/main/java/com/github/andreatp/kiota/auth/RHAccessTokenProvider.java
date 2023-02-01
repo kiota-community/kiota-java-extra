@@ -23,7 +23,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     // https://access.redhat.com/articles/3626371
 
     public final static String RH_SSO_URL = "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token";
-    public final static String RH_SSO_CLIENT_ID = "rhsm-api";
+    public final static String RH_SSO_CLIENT_ID = "cloud-services"; // or "rhsm-api"
 
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -81,6 +81,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
                     String token = null;
                     try {
                         var response = client.newCall(request).execute();
+                        // More checks and a better error handling (currently it throws null pointer)
                         token = mapper.readTree(response.body().string()).get("access_token").asText();
                     } catch (IOException e) {
                         throw new RuntimeException("Error issuing a new token", e);
