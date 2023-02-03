@@ -37,6 +37,18 @@ public class KiotaMojo extends AbstractMojo {
     private final Log log = new SystemStreamLog();
 
     /**
+     * Skip the execution of the goal
+     */
+    @Parameter(defaultValue = "false", property = "kiota.skip")
+    private boolean skip;
+
+    /**
+     * Use system provided kiota executable (needs to be available on the PATH)
+     */
+    @Parameter(defaultValue = "false", property = "kiota.system")
+    private boolean useSystemKiota;
+
+    /**
      * Kiota executable target binary folder
      */
     @Parameter(required = true, defaultValue = "${project.build.directory}/kiota/")
@@ -62,7 +74,7 @@ public class KiotaMojo extends AbstractMojo {
      * Version of Kiota to be used
      */
     // @Parameter(defaultValue = "0.10.0")
-    @Parameter(defaultValue = "0.11.2-preview")
+    @Parameter(defaultValue = "0.11.3-preview")
     private String kiotaVersion;
 
     // Kiota Options
@@ -153,14 +165,18 @@ public class KiotaMojo extends AbstractMojo {
 
     @Override
     public void execute() {
+        if (skip) {
+            return;
+        }
+
         KiotaParams kp = new KiotaParams(osName, osArch);
 
-        String executablePath = Path.of(targetBinaryFolder.getAbsolutePath(), kiotaVersion).toFile().getAbsolutePath();
-
-        // TODO: Use a system wide installation of Kiota if available?
-        downloadAndExtract(baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip", executablePath, kp);
-
-        File executableFile = Paths.get(executablePath, kp.binary()).toFile();
+        String executable = "kiota";
+        if (!useSystemKiota) {
+            String executablePath = Path.of(targetBinaryFolder.getAbsolutePath(), kiotaVersion).toFile().getAbsolutePath();
+            downloadAndExtract(baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip", executablePath, kp);
+            executable = Paths.get(executablePath, kp.binary()).toFile().getAbsolutePath();
+        }
 
         File openApiSpec = null;
         if (file == null && url == null) {
@@ -173,9 +189,9 @@ public class KiotaMojo extends AbstractMojo {
             openApiSpec = downloadSpec(url);
         }
 
-        executeKiota(executableFile, openApiSpec);
+        executeKiota(executable, openApiSpec);
         // TODO verify how this mechanism can work with: https://github.com/microsoft/OpenAPI/blob/master/extensions/x-kiota-info.md
-        checkDependencies(executableFile, openApiSpec);
+        checkDependencies(executable, openApiSpec);
     }
 
     private File downloadSpec(URL url) {
@@ -249,12 +265,12 @@ public class KiotaMojo extends AbstractMojo {
         }
     }
 
-    private void executeKiota(File binary, File openApiSpec) {
+    private void executeKiota(String binary, File openApiSpec) {
         if (!openApiSpec.exists()) {
             throw new IllegalArgumentException("Spec file not found on the path: " + openApiSpec.getAbsolutePath());
         }
         List<String> cmd = new ArrayList<>();
-        cmd.add(binary.getAbsolutePath());
+        cmd.add(binary);
         cmd.add("generate");
         // process command line options
         cmd.add("--openapi"); cmd.add(openApiSpec.getAbsolutePath());
@@ -270,11 +286,12 @@ public class KiotaMojo extends AbstractMojo {
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
 
-    private void checkDependencies(File binary, File openApiSpec) {
+    private void checkDependencies(String binary, File openApiSpec) {
         List<String> cmd = new ArrayList<>();
-        cmd.add(binary.getAbsolutePath());
+        cmd.add(binary);
         cmd.add("info");
         cmd.add("--language"); cmd.add(language);
+        cmd.add("--openapi"); cmd.add(openApiSpec.getAbsolutePath());
 
         String infoOutputCmd = runProcess(cmd, true);
         String libraryVersion = Arrays.stream(infoOutputCmd.split(NEW_LINE))
