@@ -4,7 +4,7 @@
     <groupId>com.github.andreaTP.kiota-utils</groupId>
     <artifactId>kiota-utils-parent</artifactId>
     <packaging>pom</packaging>
-    <version>999-SNAPSHOT</version>
+    <version>0.1.6</version>
     
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
