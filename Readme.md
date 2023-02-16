@@ -37,6 +37,8 @@ and you can use the plugin:
         </executions>
         <configuration>
           <file>openapi.yaml</file>
+            ... or ...
+          <url>https://raw.githubusercontent.com/OpenAPITools/openapi-petstore/master/src/main/resources/openapi.yaml</url>
           ...
         </configuration>
       </plugin>
