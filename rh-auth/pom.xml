@@ -17,12 +17,12 @@
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-abstractions</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-http-okHttp</artifactId>
-            <version>0.2.0</version>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
