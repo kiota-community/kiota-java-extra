@@ -1,6 +1,6 @@
 # Kiota Java Extra
 
-[![](https://jitpack.io/v/andreaTP/kiota-utils.svg)](https://jitpack.io/#andreaTP/kiota-utils)
+[![Release](https://img.shields.io/github/v/release/redhat-developer/kiota-java-extra)](https://search.maven.org/search?q=g:com.redhat.cloud%20a:kiota-maven-plugin)
 
 This repository contains utilities to work with Kiota and Java.
 
