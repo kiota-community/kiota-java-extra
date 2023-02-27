@@ -2,9 +2,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.redhat.cloud</groupId>
-    <artifactId>kiota-utils-parent</artifactId>
+    <artifactId>kiota-java-extra-parent</artifactId>
     <packaging>pom</packaging>
     <version>999-SNAPSHOT</version>
+    <name>Kiota Java Extra</name>
     <description>Utilities for Java SDKs using Kiota</description>
     <url>https://github.com/redhat-developer/kiota-java-extra</url>
 
