@@ -48,7 +48,7 @@ jobs:
           git tag ${{ github.event.inputs.release-version }}
           git push origin ${{ github.event.inputs.release-version }}
       - name: Publish
-        run : mvn --batch-mode -Prelease deploy
+        run : mvn --batch-mode clean deploy -Prelease -DskipTests=true
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
