@@ -1,4 +1,4 @@
-package com.github.andreatp.kiota;
+package com.redhat.cloud.kiota.maven;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.plugin.AbstractMojo;

@@ -1,4 +1,4 @@
-package com.github.andreatp.kiota.auth;
+package com.redhat.cloud.kiota.auth;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -8,6 +8,7 @@ import com.microsoft.kiota.authentication.AllowedHostsValidator;
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.Response;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -34,7 +35,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     private final String clientId;
     private final String[] allowedHosts;
     private final String offline_token;
-    private final long refreshBeforeMillis = 1000;
+    private final long refreshBeforeMillis = (System.getenv("RH_ACCESS_TOKEN_REFRESH_BEFORE") == null) ? 1000 : Long.parseLong(System.getenv("RH_ACCESS_TOKEN_REFRESH_BEFORE"));
 
     private AtomicReference<String> lastRefreshToken = new AtomicReference<>(null);
     private AtomicBoolean isRefreshing = new AtomicBoolean(false);
@@ -86,23 +87,23 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
             try {
                 if (needsRefresh()) {
                     refreshTokenCountDown.set(new CountDownLatch(1));
-                    var data = new FormBody.Builder()
+                    FormBody data = new FormBody.Builder()
                             .add("grant_type", "refresh_token")
                             .add("client_id", clientId)
                             .add("refresh_token", offline_token)
                             .build();
 
-                    var request = new Request.Builder()
+                    Request request = new Request.Builder()
                             .url(url)
                             .post(data)
                             .build();
 
                     String token = null;
                     try {
-                        var response = client.newCall(request).execute();
-                        var code = response.code();
+                        Response response = client.newCall(request).execute();
+                        int code = response.code();
                         if (code == 200) {
-                            var body = response.body().string();
+                            String body = response.body().string();
                             try {
                                 token = mapper.readTree(body).get("access_token").asText();
                             } catch (Exception e) {

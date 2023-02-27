@@ -7,26 +7,14 @@ This repository contains utilities to work with Kiota and Java.
 ## Maven Plugin
 
 The Kiota Maven plugin ease the usage of the Kiota CLI from Maven projects.
-
-To use the Kiota Maven Plugin you need to add Jitpack to the `pluginRepositories` section:
-
-```xml
-  <pluginRepositories>
-    <pluginRepository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-    </pluginRepository>
-  </pluginRepositories>
-```
-
-and you can use the plugin:
+To use the plugin add this section to your `pom.xml`:
 
 ```xml
   <build>
     <plugins>
       <plugin>
         <artifactId>kiota-maven-plugin</artifactId>
-        <groupId>com.github.andreaTP.kiota-utils</groupId>
+        <groupId>com.redhat.cloud</groupId>
         <version>${version}</version>
         <executions>
           <execution>
@@ -51,7 +39,7 @@ the available options, as of today, are (output of `mvn help:describe -DgroupId=
 ```
 Name: kiota-maven-plugin
 Description: A Maven plugin to generate code with Kiota
-Group Id: com.github.andreaTP.kiota-utils
+Group Id: com.redhat.cloud
 Artifact Id: kiota-maven-plugin
 Version: 0.1.7
 Goal Prefix: kiota
@@ -60,7 +48,7 @@ This plugin has 1 goal:
 
 kiota:generate
   Description: This plugin will run Kiota to generate sources.
-  Implementation: com.github.andreatp.kiota.KiotaMojo
+  Implementation: com.redhat.cloud.kiota.maven.KiotaMojo
   Language: java
   Bound to phase: generate-sources
 
@@ -129,22 +117,11 @@ Unknown
 
 We publish a Kiota compatible `TokenProvider` to enable ease access to RedHat services.
 
-Need to enable Jitpack as a repository.
-
-```xml
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
-
-And import the dependency with:
+Import the dependency in your `pom.xml` with:
 
 ```xml
 <dependency>
-    <groupId>com.github.andreaTP.kiota-utils</groupId>
+    <groupId>com.redhat.cloud</groupId>
     <artifactId>kiota-rh-auth</artifactId>
     <version>${version}</version>
 </dependency>

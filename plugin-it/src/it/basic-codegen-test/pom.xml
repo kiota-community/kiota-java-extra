@@ -4,41 +4,40 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>basic-codegen-test</artifactId>
-    <groupId>com.github.andreatp</groupId>
+    <groupId>com.redhat.cloud</groupId>
     <version>0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
   
     <properties>
       <maven.compiler.source>@maven.compiler.source@</maven.compiler.source>
       <maven.compiler.target>@maven.compiler.target@</maven.compiler.target>
-      <kiota.libs.version>0.2.0</kiota.libs.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-abstractions</artifactId>
-            <version>${kiota.libs.version}</version>
+            <version>@kiota.libs.version@</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-http-okHttp</artifactId>
-            <version>${kiota.libs.version}</version>
+            <version>@kiota.libs.version@</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-serialization-json</artifactId>
-            <version>${kiota.libs.version}</version>
+            <version>@kiota.libs.version@</version>
         </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-serialization-text</artifactId>
-            <version>${kiota.libs.version}</version>
+            <version>@kiota.libs.version@</version>
             </dependency>
         <dependency>
             <groupId>com.microsoft.kiota</groupId>
             <artifactId>microsoft-kiota-serialization-form</artifactId>
-            <version>${kiota.libs.version}</version>
+            <version>@kiota.libs.version@</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
@@ -57,7 +56,7 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.github.andreaTP.kiota-utils</groupId>
+                <groupId>com.redhat.cloud</groupId>
                 <artifactId>kiota-maven-plugin</artifactId>
                 <version>@project.version@</version>
                 <executions>
