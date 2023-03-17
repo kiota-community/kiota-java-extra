@@ -72,7 +72,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "0.11.1")
+    @Parameter(defaultValue = "1.0.1")
     private String kiotaVersion;
 
     // Kiota Options
@@ -319,7 +319,7 @@ public class KiotaMojo extends AbstractMojo {
         Dependency findbugs = new Dependency();
         findbugs.setGroupId("com.google.code.findbugs");
         findbugs.setArtifactId("jsr305");
-        findbugs.setVersion("3.0.0");
+        findbugs.setVersion("3.0.2");
 
         List<Dependency> needed = new ArrayList<>();
         needed.add(abstractions);
