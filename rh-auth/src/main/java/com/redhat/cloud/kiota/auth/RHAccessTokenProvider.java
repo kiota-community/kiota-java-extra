@@ -35,7 +35,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
     private final String clientId;
     private final String[] allowedHosts;
     private final String offline_token;
-    private final long refreshBeforeMillis = (System.getenv("RH_ACCESS_TOKEN_REFRESH_BEFORE") == null) ? 1000 : Long.parseLong(System.getenv("RH_ACCESS_TOKEN_REFRESH_BEFORE"));
+    private final long refreshBeforeMillis = (System.getenv("RH_ACCESS_TOKEN_REFRESH_BEFORE") == null) ? 60000 : Long.parseLong(System.getenv("RH_ACCESS_TOKEN_REFRESH_BEFORE"));
 
     private AtomicReference<String> lastRefreshToken = new AtomicReference<>(null);
     private AtomicBoolean isRefreshing = new AtomicBoolean(false);
@@ -78,7 +78,7 @@ public class RHAccessTokenProvider implements AccessTokenProvider {
                 JWT
                         .decode(lastRefreshToken.get())
                         .getExpiresAtAsInstant()
-                        .plusMillis(refreshBeforeMillis)
+                        .minusMillis(refreshBeforeMillis)
                         .isBefore(Instant.now()));
     }
 
