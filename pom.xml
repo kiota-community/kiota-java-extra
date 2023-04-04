@@ -43,6 +43,12 @@
             <organization>Red Hat</organization>
             <organizationUrl>https://www.redhat.com</organizationUrl>
         </developer>
+        <developer>
+            <name>Miroslav Safar</name>
+            <email>miroslav.safar@znojmo.cz</email>
+            <organization>Red Hat</organization>
+            <organizationUrl>https://www.redhat.com</organizationUrl>
+        </developer>
     </developers>
     
     <properties>
@@ -64,6 +70,7 @@
         <module>plugin</module>
         <module>plugin-it</module>
         <module>rh-auth</module>
+        <module>serialization/json</module>
     </modules>
 
     <build>
