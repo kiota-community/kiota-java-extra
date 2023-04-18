@@ -371,7 +371,6 @@ public class KiotaMojo extends AbstractMojo {
                 zipFile.delete();
             }
         } catch (IOException e) {
-            e.printStackTrace();
             throw new IllegalStateException("Error downloading the Kiota release: " + url, e);
         }
     }
