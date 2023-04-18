@@ -72,7 +72,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "1.0.1")
+    @Parameter(defaultValue = "1.1.2")
     private String kiotaVersion;
 
     // Kiota Options
@@ -364,13 +364,14 @@ public class KiotaMojo extends AbstractMojo {
                     fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
                 }
                 try (FileSystem fileSystem = FileSystems.newFileSystem(zipFile.toPath(), this.getClass().getClassLoader())) {
-                    Path fileToExtract = fileSystem.getPath("/" + kp.downloadArtifact() + "/" + kp.binary());
+                    Path fileToExtract = fileSystem.getPath("/" + kp.binary());
                     Files.copy(fileToExtract, finalDestination.toPath());
                 }
                 finalDestination.setExecutable(true, false);
                 zipFile.delete();
             }
         } catch (IOException e) {
+            e.printStackTrace();
             throw new IllegalStateException("Error downloading the Kiota release: " + url, e);
         }
     }
