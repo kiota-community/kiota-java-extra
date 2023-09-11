@@ -4,7 +4,7 @@
     <groupId>com.redhat.cloud</groupId>
     <artifactId>kiota-java-extra-parent</artifactId>
     <packaging>pom</packaging>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.6</version>
     <name>Kiota Java Extra</name>
     <description>Utilities for Java SDKs using Kiota</description>
     <url>https://github.com/redhat-developer/kiota-java-extra</url>
