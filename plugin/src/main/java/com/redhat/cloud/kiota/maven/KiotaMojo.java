@@ -72,7 +72,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "1.3.0")
+    @Parameter(defaultValue = "1.6.1")
     private String kiotaVersion;
 
     // Kiota Options
@@ -316,16 +316,20 @@ public class KiotaMojo extends AbstractMojo {
         Dependency serializationForm = dependencyPrototype.clone();
         serializationForm.setArtifactId("microsoft-kiota-serialization-form");
 
+        Dependency serializationMultipart = dependencyPrototype.clone();
+        serializationMultipart.setArtifactId("microsoft-kiota-serialization-multipart");
+
         Dependency findbugs = new Dependency();
-        findbugs.setGroupId("com.google.code.findbugs");
-        findbugs.setArtifactId("jsr305");
-        findbugs.setVersion("3.0.2");
+        findbugs.setGroupId("jakarta.annotation");
+        findbugs.setArtifactId("jakarta.annotation-api");
+        findbugs.setVersion("2.1.1");
 
         List<Dependency> needed = new ArrayList<>();
         needed.add(abstractions);
         needed.add(serializationJson);
         needed.add(serializationText);
         needed.add(serializationForm);
+        needed.add(serializationMultipart);
         needed.add(findbugs);
 
         for (Object o: project.getDependencies()) {
