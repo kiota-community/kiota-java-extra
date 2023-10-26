@@ -72,7 +72,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "1.6.1")
+    @Parameter(defaultValue = "1.7.0")
     private String kiotaVersion;
 
     // Kiota Options
@@ -101,6 +101,15 @@ public class KiotaMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.build.directory}/generated-sources/kiota")
     private File targetDirectory;
 
+    private File finalTargetDirectory() {
+        Path namespaceResolver = targetDirectory.toPath();
+
+        for (String part: namespace.split("\\.")) {
+            namespaceResolver = namespaceResolver.resolve(part);
+        }
+        return namespaceResolver.toFile();
+    }
+
     /**
      * Language to generate the code for:
      * <CSharp|Go|Java|PHP|Python|Ruby|Shell|Swift|TypeScript>
@@ -119,7 +128,7 @@ public class KiotaMojo extends AbstractMojo {
      * The namespace to use for the core client class specified with the --class-name option. [default: ApiSdk]
      *
      */
-    @Parameter(defaultValue = "ApiSdk")
+    @Parameter(defaultValue = "com.apisdk")
     private String namespace;
 
     /**
@@ -225,7 +234,7 @@ public class KiotaMojo extends AbstractMojo {
             if (ps.exitValue() != 0) {
                 throw new RuntimeException("Error executing the Kiota command, exit code is " + ps.exitValue());
             }
-            File kiotaLockFile = new File(targetDirectory, "kiota-lock.json");
+            File kiotaLockFile = new File(finalTargetDirectory(), "kiota-lock.json");
             if (!kiotaLockFile.exists()) {
                 throw new RuntimeException("Error executing the Kiota command, no output found, cannot find the generated lock file.");
             }
@@ -268,11 +277,14 @@ public class KiotaMojo extends AbstractMojo {
             throw new IllegalArgumentException("Spec file not found on the path: " + openApiSpec.getAbsolutePath());
         }
         List<String> cmd = new ArrayList<>();
+        finalTargetDirectory().mkdirs();
+        String finalTargetDirectory = finalTargetDirectory().getAbsolutePath();
+
         cmd.add(binary);
         cmd.add("generate");
         // process command line options
         cmd.add("--openapi"); cmd.add(openApiSpec.getAbsolutePath());
-        cmd.add("--output"); cmd.add(targetDirectory.getAbsolutePath());
+        cmd.add("--output"); cmd.add(finalTargetDirectory);
         cmd.add("--language"); cmd.add(language);
         cmd.add("--class-name"); cmd.add(clientClass);
         cmd.add("--namespace-name"); cmd.add(namespace);

@@ -18,13 +18,13 @@ package com.github.andreatp.kiota.tests;
 
 import org.junit.Test;
 
-import apisdk.models.Widget;
+import com.apisdk.models.Widget;
 
 public class BasicCodegenTest {
 
     @Test
     public void test() throws Exception {
-        Class.forName("apisdk.models.Widget");
+        Class.forName("com.apisdk.models.Widget");
         
         Widget widget = new Widget();
         widget.setName("Test");
