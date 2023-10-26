@@ -104,8 +104,6 @@ public class KiotaMojo extends AbstractMojo {
     private File finalTargetDirectory() {
         Path namespaceResolver = targetDirectory.toPath();
 
-        System.out.println("Namespace is " + namespace);
-
         for (String part: namespace.split("\\.")) {
             namespaceResolver = namespaceResolver.resolve(part);
         }
