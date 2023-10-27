@@ -5,12 +5,12 @@
     <parent>
         <groupId>com.redhat.cloud</groupId>
         <artifactId>kiota-java-extra-parent</artifactId>
-        <version>999-SNAPSHOT</version>
+        <version>0.0.7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>kiota-maven-plugin</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.7</version>
     <packaging>maven-plugin</packaging>
     
     <description>A Maven plugin to generate code with Kiota</description>
