@@ -38,8 +38,7 @@
   </modules>
 
   <scm>
-    <connection>scm:git:git@github.com:redhat-developer/kiota-java-extra.git</connection>
-    <developerConnection>scm:git:git@github.com:redhat-developer/kiota-java-extra.git</developerConnection>
+    <connection>scm:git@github.com:kiota-community/kiota-java-extra.git</connection>
     <url>scm:git:git@github.com:redhat-developer/kiota-java-extra.git</url>
   </scm>
 
@@ -54,9 +53,12 @@
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
+    <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
     <maven-invoker-plugin.version>3.6.0</maven-invoker-plugin.version>
     <maven-failsafe-plugin.version>3.2.2</maven-failsafe-plugin.version>
+    <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
     <maven-plugin-plugin.version>3.10.2</maven-plugin-plugin.version>
     <versions-maven-plugin.version>2.16.1</versions-maven-plugin.version>
     <maven-javadoc-plugin.version>3.6.2</maven-javadoc-plugin.version>
