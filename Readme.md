@@ -1,8 +1,8 @@
 # Kiota Java Extra
 
-[![Release](https://img.shields.io/github/v/release/redhat-developer/kiota-java-extra)](https://search.maven.org/search?q=g:com.redhat.cloud%20a:kiota-maven-plugin)
+[![Release](https://img.shields.io/github/v/release/kiota-community/kiota-java-extra)](https://search.maven.org/search?q=g:io.kiota.maven%20a:kiota-maven-plugin)
 
-This repository contains utilities to work with Kiota and Java.
+Integrations, utilities and alternative implementations to work with [Kiota](https://github.com/microsoft/kiota) in Java.
 
 ## Maven Plugin
 
@@ -14,7 +14,7 @@ To use the plugin add this section to your `pom.xml`:
     <plugins>
       <plugin>
         <artifactId>kiota-maven-plugin</artifactId>
-        <groupId>com.redhat.cloud</groupId>
+        <groupId>io.kiota</groupId>
         <version>${version}</version>
         <executions>
           <execution>
@@ -34,12 +34,12 @@ To use the plugin add this section to your `pom.xml`:
   </build>
 ```
 
-the available options, as of today, are (output of `mvn help:describe -DgroupId=com.github.andreaTP.kiota-utils -DartifactId=kiota-maven-plugin -Dversion=0.1.7 -Ddetail`):
+the available options, as of today, are (output of `mvn help:describe -DgroupId=io.kiota.maven -DartifactId=kiota-maven-plugin -Dversion=0.1.7 -Ddetail`):
 
 ```
 Name: kiota-maven-plugin
 Description: A Maven plugin to generate code with Kiota
-Group Id: com.redhat.cloud
+Group Id: io.kiota.maven
 Artifact Id: kiota-maven-plugin
 Version: 0.1.7
 Goal Prefix: kiota
@@ -111,29 +111,4 @@ Unknown
     useSystemKiota (Default: false)
       User property: kiota.system
       Use system provided kiota executable (needs to be available on the PATH)
-```
-
-## RedHat SSO Auth
-
-We publish a Kiota compatible `TokenProvider` to enable ease access to RedHat services.
-
-Import the dependency in your `pom.xml` with:
-
-```xml
-<dependency>
-    <groupId>com.redhat.cloud</groupId>
-    <artifactId>kiota-rh-auth</artifactId>
-    <version>${version}</version>
-</dependency>
-```
-
-Now you can easily authenticate through RedHat SSO using an [offline token](https://access.redhat.com/articles/3626371) to access Red Hat APIs:
-
-```java
-OkHttpRequestAdapter adapter = new OkHttpRequestAdapter(
-        new BaseBearerTokenAuthenticationProvider(
-                new RHAccessTokenProvider(offline_token)
-        ));
-
-var client = new ApiClient(adapter);
 ```
