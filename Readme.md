@@ -34,12 +34,12 @@ To use the plugin add this section to your `pom.xml`:
   </build>
 ```
 
-the available options, as of today, are (output of `mvn help:describe -DgroupId=io.kiota.maven -DartifactId=kiota-maven-plugin -Dversion=0.1.7 -Ddetail`):
+the available options, as of today, are (output of `mvn help:describe -DgroupId=io.kiota -DartifactId=kiota-maven-plugin -Dversion=0.1.7 -Ddetail`):
 
 ```
 Name: kiota-maven-plugin
 Description: A Maven plugin to generate code with Kiota
-Group Id: io.kiota.maven
+Group Id: io.kiota
 Artifact Id: kiota-maven-plugin
 Version: 0.1.7
 Goal Prefix: kiota
