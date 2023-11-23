@@ -10,8 +10,8 @@
   <url>https://github.com/redhat-developer/kiota-java-extra</url>
 
   <organization>
-    <name>Red Hat</name>
-    <url>https://www.redhat.com</url>
+    <name>Kiota Community</name>
+    <url>https://kiota.io</url>
   </organization>
 
   <licenses>
@@ -39,7 +39,7 @@
 
   <scm>
     <connection>scm:git@github.com:kiota-community/kiota-java-extra.git</connection>
-    <url>scm:git:git@github.com:redhat-developer/kiota-java-extra.git</url>
+    <url>https://github.com/kiota-community/kiota-java-extra.git</url>
   </scm>
 
   <distributionManagement>
