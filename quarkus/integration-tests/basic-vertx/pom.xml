@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>quarkus-kiota-integration-tests-parent</artifactId>
-    <version>0.0.8</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>quarkus-kiota-integration-tests-basic-vertx</artifactId>
   <name>Quarkus Kiota - Integration Tests - Basic VertX</name>
