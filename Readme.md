@@ -164,3 +164,81 @@ Using the extension, by default, the Json serializer and deserializer will be ba
 ## Libraries
 
 In this project you have a few alternative implementations of the [Core libraries](https://learn.microsoft.com/en-us/openapi/kiota/design#kiota-abstractions)
+
+### Serialization Jackson
+
+This is a [Jackson](https://github.com/FasterXML/jackson) based implementation of the Json serialization/deserialization APIs exposed by the core libraries.
+
+To use it, add the dependency to your project:
+
+```xml
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>kiota-serialization-jackson</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+and make sure to remove from the classpath the default implementation `com.microsoft.kiota:microsoft-kiota-serialization-json`.
+When generating the client code you need to change the defaults as well to use the provided implementations:
+
+- `serializer`: `io.kiota.serialization.json.JsonSerializationWriterFactory`
+- `deserializer`: `io.kiota.serialization.json.JsonParseNodeFactory`
+
+### Http Vert.X
+
+This is an `RequestAdapter` implementation based on the [Vert.X Web Client](https://vertx.io/docs/vertx-web-client/java/).
+
+To use it, add the dependency to your project:
+
+```xml
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>kiota-http-vertx</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+and make sure to remove from the classpath the default implementation `com.microsoft.kiota:microsoft-kiota-http-okHttp`.
+You can now use it in your codebase:
+
+```java
+var adapter = new VertXRequestAdapter(vertx);
+```
+
+To configure authorization we expect you to tweak the `VertX.WebClient` instance before passing it to the constructor, for OIDC with Client Id and secret looks as follows:
+
+```java
+OAuth2Options options =
+        new OAuth2Options()
+                .setFlow(OAuth2FlowType.CLIENT)
+                .setClientId(CLIENT_ID)
+                .setTokenPath(keycloakUrl + "token")
+                .setClientSecret(CLIENT_SECRET);
+
+OAuth2Auth oAuth2Auth = OAuth2Auth.create(vertx, options);
+
+Oauth2Credentials oauth2Credentials = new Oauth2Credentials();
+
+OAuth2WebClient oAuth2WebClient =
+        OAuth2WebClient.create(WebClient.create(vertx), oAuth2Auth)
+                .withCredentials(oauth2Credentials);
+
+var adapter = new VertXRequestAdapter(oAuth2WebClient);
+```
+
+### Http JDK
+
+This is an `RequestAdapter` implementation based on the [Java standard library Http Client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpClient.html).
+
+To use it, add the dependency to your project:
+
+```xml
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>kiota-http-jdk</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+and make sure to remove from the classpath the default implementation `com.microsoft.kiota:microsoft-kiota-http-okHttp`.
