@@ -63,17 +63,14 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Base URL to be used for the download
      */
-    // TODO: fix me when Kiota 1.9.0 is out
-    // @Parameter(defaultValue = "https://github.com/microsoft/kiota/releases/download")
-    @Parameter(defaultValue = "https://github.com/andreaTP/kiota-prerelease/releases/download")
+    @Parameter(defaultValue = "https://github.com/microsoft/kiota/releases/download")
     private String baseURL;
 
     /**
      * Version of Kiota to be used
      */
     // TODO: fix me when Kiota 1.9.0 is out
-    // @Parameter(defaultValue = "1.7.0")
-    @Parameter(defaultValue = "0.0.0-pre+microsoft.main.f84da5a")
+    @Parameter(defaultValue = "1.9.0-preview.202311230001")
     private String kiotaVersion;
 
     // Kiota Options

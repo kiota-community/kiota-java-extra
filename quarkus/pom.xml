@@ -12,7 +12,7 @@
   <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <description>A Quarkus Extension generate code with Kiota</description>
+  <description>A Quarkus Extension to generate code with Kiota</description>
 
   <modules>
     <module>deployment</module>

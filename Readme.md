@@ -1,6 +1,6 @@
 # Kiota Java Extra
 
-[![Release](https://img.shields.io/github/v/release/kiota-community/kiota-java-extra)](https://search.maven.org/search?q=g:io.kiota.maven%20a:kiota-maven-plugin)
+[![Release](https://img.shields.io/github/v/release/kiota-community/kiota-java-extra)](https://search.maven.org/search?q=g:io.kiota%20a:kiota-maven-plugin)
 
 Integrations, utilities and alternative implementations to work with [Kiota](https://github.com/microsoft/kiota) in Java.
 
