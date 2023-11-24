@@ -1,0 +1,3 @@
+io.kiota.quarkus.deployment.KiotaJsonCodeGen
+io.kiota.quarkus.deployment.KiotaYamlCodeGen
+io.kiota.quarkus.deployment.KiotaYmlCodeGen
