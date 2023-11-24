@@ -34,28 +34,13 @@ To use the plugin add this section to your `pom.xml`:
   </build>
 ```
 
-the available options, as of today, are (output of `mvn help:describe -DgroupId=io.kiota -DartifactId=kiota-maven-plugin -Dversion=0.1.7 -Ddetail`):
+the available options, as of today, are (output of `mvn help:describe -DgroupId=io.kiota -DartifactId=kiota-maven-plugin -Dversion=999-SNAPSHOT -Ddetail`):
 
 ```
-Name: kiota-maven-plugin
-Description: A Maven plugin to generate code with Kiota
-Group Id: io.kiota
-Artifact Id: kiota-maven-plugin
-Version: 0.1.7
-Goal Prefix: kiota
-
-This plugin has 1 goal:
-
-kiota:generate
-  Description: This plugin will run Kiota to generate sources.
-  Implementation: com.redhat.cloud.kiota.maven.KiotaMojo
-  Language: java
-  Bound to phase: generate-sources
-
-  Available parameters:
+Available parameters:
 
     baseURL (Default:
-    https://github.com/microsoft/kiota/releases/download)
+    https://github.com/andreaTP/kiota-prerelease/releases/download)
       Base URL to be used for the download
 
     cleanOutput (Default: false)
@@ -67,6 +52,10 @@ kiota:generate
     clientClass (Default: ApiClient)
       The class name to use for the core client class. [default: ApiClient]
 
+    deserializers (Default:
+    io.kiota.serialization.json.JsonParseNodeFactory,com.microsoft.kiota.serialization.TextParseNodeFactory,com.microsoft.kiota.serialization.FormParseNodeFactory)
+      The deserializers to be used by kiota
+
     downloadTarget (Default: ${basedir}/target/openapi-spec)
       The Download target folder for CRDs downloaded from remote URLs
 
@@ -74,23 +63,28 @@ kiota:generate
       The openapi specification to be used for generating code
 
     kiotaLogLevel (Default: Warning)
-Unknown
+      The log level of Kiota to use when logging messages to the main output.
+      [default: Warning]
 
     kiotaTimeout (Default: 30)
       Kiota timeout in seconds
 
-    kiotaVersion (Default: 0.11.1)
+    kiotaVersion (Default: 0.0.0-pre+microsoft.main.f84da5a)
       Version of Kiota to be used
 
     language (Default: Java)
-Unknown
+      Language to generate the code for:
 
-    namespace (Default: ApiSdk)
+    namespace (Default: com.apisdk)
       The namespace to use for the core client class specified with the
       --class-name option. [default: ApiSdk]
 
     osName (Default: ${os.name})
       OS name
+
+    serializers (Default:
+    io.kiota.serialization.json.JsonSerializationWriterFactory,com.microsoft.kiota.serialization.TextSerializationWriterFactory,com.microsoft.kiota.serialization.FormSerializationWriterFactory,com.microsoft.kiota.serialization.MultipartSerializationWriterFactory)
+      The serializers to be used by kiota
 
     skip (Default: false)
       User property: kiota.skip
@@ -112,3 +106,61 @@ Unknown
       User property: kiota.system
       Use system provided kiota executable (needs to be available on the PATH)
 ```
+
+## Quarkus extension
+
+If you have a supersonic, subatomic [Quarkus](https://quarkus.io/) project you can use this extension to generate code with Kiota:
+
+```xml
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>quarkus-kiota</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+remember to enable the code generation in the `quarkus-maven-plugin` configuration, if not already present, add `<goal>generate-code</goal>`:
+
+```xml
+<plugin>
+  <groupId>io.quarkus</groupId>
+  <artifactId>quarkus-maven-plugin</artifactId>
+  <executions>
+    <execution>
+      <goals>
+        <goal>build</goal>
+        <goal>generate-code</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+```
+
+now you can drop any Open API specification in the `src/<scope>/openapi` folder and configure the extension as usual with Quarkus configuration.
+We highly encourage you to pin `quarkus.kiota.version` to a specific version and not relying on the "latest detection" built-in mechanism for production code.
+
+| config | description |
+|---|---|
+| quarkus.kiota.os | Override the detected Operating System |
+| quarkus.kiota.arch | Override the detected Architecture |
+| quarkus.kiota.provided | Specify the path to an available Kiota CLI to be used |
+| quarkus.kiota.release.url | Define an alternative URL to be used to download the Kiota CLI |
+| quarkus.kiota.version | Define a specific Kiota version to be used |
+| quarkus.kiota.timeout | Global timeout over the execution of the Kiota CLI |
+
+To fine tune the generation you can define additional properties after the Open API spec file name:
+
+| config | description |
+|---|---|
+| quarkus.kiota.<filename>.class-name | Specify the name for the generated client class |
+| quarkus.kiota.<filename>.package-name | Specify the name of the package for the generated sources |
+| quarkus.kiota.<filename>.include-path | Glob expression to identify the endpoint to be included in the generation |
+| quarkus.kiota.<filename>.exclude-path | Glob expression to identify the endpoint to be excluded in the generation |
+| quarkus.kiota.<filename>.serializer | Overwrite the serializers for the generation |
+| quarkus.kiota.<filename>.deserializer | Overwrite the deserializers for the generation |
+
+Using the extension, by default, the Json serializer and deserializer will be based on Jackson instead of the official one based on Gson.
+
+## Libraries
+
+In this project you have a few alternative implementations of the [Core libraries](https://learn.microsoft.com/en-us/openapi/kiota/design#kiota-abstractions)
