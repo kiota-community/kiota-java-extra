@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-quarkus-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.8</version>
   </parent>
   <artifactId>quarkus-kiota</artifactId>
   <name>Quarkus Kiota - Runtime</name>
