@@ -6,7 +6,7 @@ Integrations, utilities and alternative implementations to work with [Kiota](htt
 
 ## Maven Plugin
 
-The Kiota Maven plugin ease the usage of the Kiota CLI from Maven projects.
+The Kiota Maven plugin eases the usage of the Kiota CLI from Maven projects.
 To use the plugin add this section to your `pom.xml`:
 
 ```xml
@@ -137,7 +137,7 @@ remember to enable the code generation in the `quarkus-maven-plugin` configurati
 ```
 
 now you can drop any Open API specification in the `src/<scope>/openapi` folder and configure the extension as usual with Quarkus configuration.
-We highly encourage you to pin `quarkus.kiota.version` to a specific version and not relying on the "latest detection" built-in mechanism for production code.
+We highly encourage you to pin `quarkus.kiota.version` to a specific version instead of relying on the "latest detection" built-in mechanism for production code.
 
 | config | description |
 |---|---|
@@ -163,13 +163,13 @@ Using the extension, by default, the Json serializer and deserializer will be ba
 
 ## Libraries
 
-In this project you have a few alternative implementations of the [Core libraries](https://learn.microsoft.com/en-us/openapi/kiota/design#kiota-abstractions)
+In this project you have a few alternative implementations of the Kiota [Core libraries](https://learn.microsoft.com/en-us/openapi/kiota/design#kiota-abstractions)
 
 ### Serialization Jackson
 
 This is a [Jackson](https://github.com/FasterXML/jackson) based implementation of the Json serialization/deserialization APIs exposed by the core libraries.
 
-To use it, add the dependency to your project:
+To use it, add the following dependency to your project:
 
 ```xml
 <dependency>
@@ -187,9 +187,9 @@ When generating the client code you need to change the defaults as well to use t
 
 ### Http Vert.X
 
-This is an `RequestAdapter` implementation based on the [Vert.X Web Client](https://vertx.io/docs/vertx-web-client/java/).
+This is a `RequestAdapter` implementation based on the [Vert.X Web Client](https://vertx.io/docs/vertx-web-client/java/).
 
-To use it, add the dependency to your project:
+To use it, add the following dependency to your project:
 
 ```xml
 <dependency>
@@ -206,7 +206,8 @@ You can now use it in your codebase:
 var adapter = new VertXRequestAdapter(vertx);
 ```
 
-To configure authorization we expect you to tweak the `VertX.WebClient` instance before passing it to the constructor, for OIDC with Client Id and secret looks as follows:
+To configure authorization we expect you to tweak the `VertX.WebClient` instance before passing it to the constructor.
+For example, using OIDC with Client Id and secret, your code might look like this:
 
 ```java
 OAuth2Options options =
@@ -229,7 +230,7 @@ var adapter = new VertXRequestAdapter(oAuth2WebClient);
 
 ### Http JDK
 
-This is an `RequestAdapter` implementation based on the [Java standard library Http Client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpClient.html).
+This is a `RequestAdapter` implementation based on the [Java standard library Http Client](https://docs.oracle.com/en/java/javase/11/docs/api/java.net.http/java/net/http/HttpClient.html).
 
 To use it, add the dependency to your project:
 
