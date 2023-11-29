@@ -29,7 +29,7 @@ public class KiotaCodeGenConfig {
     // Kiota version, will try to resolve latest if not provided
     private static final String VERSION = KIOTA_CONFIG_PREFIX + ".version";
     // Timout, in seconds, used when executing the Kiota CLI
-    private static final int DEFAULT_TIMEOUT = 5;
+    private static final int DEFAULT_TIMEOUT = 30;
     private static final String TIMEOUT = KIOTA_CONFIG_PREFIX + ".timeout";
 
     // Kiota generate parameters

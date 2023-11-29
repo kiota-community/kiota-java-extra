@@ -238,7 +238,7 @@ public class JsonSerializationWriter implements SerializationWriter {
         try {
             if (values != null) { // empty array is meaningful
                 if (key != null && !key.isEmpty()) {
-                    generator.writeStartArray(key);
+                    generator.writeArrayFieldStart(key);
                 } else {
                     generator.writeStartArray();
                 }
@@ -257,7 +257,7 @@ public class JsonSerializationWriter implements SerializationWriter {
         try {
             if (values != null) { // empty array is meaningful
                 if (key != null && !key.isEmpty()) {
-                    generator.writeStartArray(key);
+                    generator.writeArrayFieldStart(key);
                 } else {
                     generator.writeStartArray();
                 }
@@ -276,7 +276,7 @@ public class JsonSerializationWriter implements SerializationWriter {
         try {
             if (values != null) { // empty array is meaningful
                 if (key != null && !key.isEmpty()) {
-                    generator.writeStartArray(key);
+                    generator.writeArrayFieldStart(key);
                 } else {
                     generator.writeStartArray();
                 }
@@ -302,7 +302,7 @@ public class JsonSerializationWriter implements SerializationWriter {
                             .collect(Collectors.toList());
             if (value != null || !nonNullAdditionalValuesToMerge.isEmpty()) {
                 if (key != null && !key.isEmpty()) {
-                    generator.writeStartObject(key);
+                    generator.writeFieldName(key);
                 }
                 if (onBeforeObjectSerialization != null && value != null) {
                     onBeforeObjectSerialization.accept(value);
@@ -414,7 +414,7 @@ public class JsonSerializationWriter implements SerializationWriter {
             if (value == null) writeNullValue(key);
             else {
                 if (key != null && !key.isEmpty()) {
-                    generator.writeStartObject(key);
+                    generator.writeObjectFieldStart(key);
                 } else {
                     generator.writeStartObject();
                 }
