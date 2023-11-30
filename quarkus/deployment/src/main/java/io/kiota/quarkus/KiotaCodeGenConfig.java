@@ -42,7 +42,7 @@ public class KiotaCodeGenConfig {
     private static final String EXCLUDE_PATH = ".exclude-path";
     private static final List<String> DEFAULT_SERIALIZER =
             List.of(
-                    "io.kiota.serialization.json.JsonSerializationWriterFactory",
+                    "io.kiota.serialization.json.quarkus.JsonSerializationWriterFactory",
                     "com.microsoft.kiota.serialization.TextSerializationWriterFactory",
                     "com.microsoft.kiota.serialization.FormSerializationWriterFactory",
                     "com.microsoft.kiota.serialization.MultipartSerializationWriterFactory");
@@ -50,7 +50,7 @@ public class KiotaCodeGenConfig {
 
     private static final List<String> DEFAULT_DESERIALIZER =
             List.of(
-                    "io.kiota.serialization.json.JsonParseNodeFactory",
+                    "io.kiota.serialization.json.quarkus.JsonParseNodeFactory",
                     "com.microsoft.kiota.serialization.TextParseNodeFactory",
                     "com.microsoft.kiota.serialization.FormParseNodeFactory");
     private static final String DESERIALIZER = ".deserializer";
