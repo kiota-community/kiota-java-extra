@@ -3,17 +3,29 @@ package io.kiota.serialization.json.quarkus;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import jakarta.enterprise.context.Dependent;
+import io.quarkus.arc.DefaultBean;
+import jakarta.enterprise.inject.Produces;
 import jakarta.inject.Inject;
 
-// @ApplicationScoped
-@Dependent
+@DefaultBean
 public class JsonMapper {
-    private ObjectMapper mapper;
+    @Inject ObjectMapper mapper;
 
     @Inject
     JsonMapper(ObjectMapper mapper) {
         this.mapper = mapper;
+    }
+
+    @Produces
+    @DefaultBean
+    public JsonParseNodeFactory jsonParseNodeFactory() {
+        return new JsonParseNodeFactory(this);
+    }
+
+    @Produces
+    @DefaultBean
+    public JsonSerializationWriterFactory jsonSerializationWriterFactory() {
+        return new JsonSerializationWriterFactory(this);
     }
 
     public ObjectReader getObjectReader() {

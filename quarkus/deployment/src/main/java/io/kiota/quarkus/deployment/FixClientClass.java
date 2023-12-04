@@ -44,15 +44,19 @@ public class FixClientClass {
 
         //        clientClass.addAnnotation("ApplicationScoped");
 
-        cu.addImport("jakarta.enterprise.context.Dependent");
+        //        cu.addImport("jakarta.enterprise.context.Dependent");
+        //
+        //        clientClass.addAnnotation("Dependent");
 
-        clientClass.addAnnotation("Dependent");
-        clientClass
-                .addField("JsonSerializationWriterFactory", "jsonSerializationWriterFactory")
-                .addAnnotation("Inject");
-        clientClass
-                .addField("JsonParseNodeFactory", "jsonParseNodeFactory")
-                .addAnnotation("Inject");
+        cu.addImport("io.kiota.serialization.json.quarkus.JsonMapper");
+        //        clientClass
+        //                .addField("JsonSerializationWriterFactory",
+        // "jsonSerializationWriterFactory")
+        //                .addAnnotation("Inject");
+        //        clientClass
+        //                .addField("JsonParseNodeFactory", "jsonParseNodeFactory")
+        //                .addAnnotation("Inject");
+        clientClass.addField("JsonMapper", "mapper").addAnnotation("Inject");
 
         var statements = constructorBody.getStatements();
 
@@ -63,15 +67,15 @@ public class FixClientClass {
                         i,
                         new ExpressionStmt(
                                 new NameExpr(
-                                        "SerializationWriterFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(jsonSerializationWriterFactory.getValidContentType(),"
-                                            + "  jsonSerializationWriterFactory)")));
+                                        "SerializationWriterFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(mapper.jsonSerializationWriterFactory().getValidContentType(),"
+                                            + "  mapper.jsonSerializationWriterFactory())")));
             } else if (stmt.toString().contains("JsonParseNodeFactory")) {
                 constructorBody.setStatement(
                         i,
                         new ExpressionStmt(
                                 new NameExpr(
-                                        "ParseNodeFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(jsonParseNodeFactory.getValidContentType(),"
-                                            + " jsonParseNodeFactory)")));
+                                        "ParseNodeFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(mapper.jsonParseNodeFactory().getValidContentType(),"
+                                            + " mapper.jsonParseNodeFactory())")));
             }
         }
 

@@ -3,7 +3,7 @@ package io.kiota.serialization.quarkus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.microsoft.kiota.serialization.SerializationWriter;
-import io.kiota.serialization.json.quarkus.JsonSerializationWriterFactory;
+import io.kiota.serialization.json.quarkus.JsonMapper;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.inject.Inject;
 import java.io.IOException;
@@ -14,13 +14,13 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 public class ArrayTests {
 
-    @Inject JsonSerializationWriterFactory serializationWriterFactory;
+    @Inject JsonMapper mapper;
 
     @Test
     public void produceCorrectArrayOfElements() throws IOException {
         // Arrange
         SerializationWriter writer =
-                serializationWriterFactory.getSerializationWriter("application/json");
+                mapper.jsonSerializationWriterFactory().getSerializationWriter("application/json");
 
         // Act
         writer.writeCollectionOfPrimitiveValues(null, List.of("one", "two", "three"));
