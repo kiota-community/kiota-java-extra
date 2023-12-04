@@ -40,44 +40,49 @@ public class FixClientClass {
         cu.addImport("com.microsoft.kiota.serialization.SerializationWriterFactoryRegistry");
         cu.addImport("com.microsoft.kiota.serialization.ParseNodeFactoryRegistry");
         cu.addImport("jakarta.inject.Inject");
-        //        cu.addImport("jakarta.enterprise.context.ApplicationScoped");
+        cu.addImport("com.fasterxml.jackson.databind.ObjectMapper");
 
-        //        clientClass.addAnnotation("ApplicationScoped");
-
-        //        cu.addImport("jakarta.enterprise.context.Dependent");
-        //
-        //        clientClass.addAnnotation("Dependent");
-
-        cu.addImport("io.kiota.serialization.json.quarkus.JsonMapper");
-        //        clientClass
-        //                .addField("JsonSerializationWriterFactory",
-        // "jsonSerializationWriterFactory")
-        //                .addAnnotation("Inject");
-        //        clientClass
-        //                .addField("JsonParseNodeFactory", "jsonParseNodeFactory")
-        //                .addAnnotation("Inject");
-        clientClass.addField("JsonMapper", "mapper").addAnnotation("Inject");
+        // Add the object mapper to the contructor arguments
+        clientClass.getConstructors().get(0).addParameter("ObjectMapper", "mapper");
 
         var statements = constructorBody.getStatements();
 
         for (int i = 0; i < statements.size(); i++) {
             var stmt = statements.get(i);
+
+            // Fix up the reflective instantiation
             if (stmt.toString().contains("JsonSerializationWriterFactory")) {
                 constructorBody.setStatement(
                         i,
                         new ExpressionStmt(
                                 new NameExpr(
-                                        "SerializationWriterFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(mapper.jsonSerializationWriterFactory().getValidContentType(),"
-                                            + "  mapper.jsonSerializationWriterFactory())")));
+                                        "SerializationWriterFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(jsonSerializationWriterFactory.getValidContentType(),"
+                                            + "  jsonSerializationWriterFactory)")));
             } else if (stmt.toString().contains("JsonParseNodeFactory")) {
                 constructorBody.setStatement(
                         i,
                         new ExpressionStmt(
                                 new NameExpr(
-                                        "ParseNodeFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(mapper.jsonParseNodeFactory().getValidContentType(),"
-                                            + " mapper.jsonParseNodeFactory())")));
+                                        "ParseNodeFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(jsonParseNodeFactory.getValidContentType(),"
+                                            + " jsonParseNodeFactory)")));
+            } else if (stmt.toString().contains("registerDefaultSerializer")) {
+                // TODO: we need to avoid reflection instantiating those
             }
         }
+
+        // right after the `super` call
+        constructorBody.addStatement(
+                1,
+                new ExpressionStmt(
+                        new NameExpr(
+                                "JsonSerializationWriterFactory jsonSerializationWriterFactory ="
+                                        + " new JsonSerializationWriterFactory(mapper)")));
+        constructorBody.addStatement(
+                2,
+                new ExpressionStmt(
+                        new NameExpr(
+                                "JsonParseNodeFactory jsonParseNodeFactory = new"
+                                        + " JsonParseNodeFactory(mapper)")));
 
         source.saveAll();
     }

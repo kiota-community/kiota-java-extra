@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.apisdk.example.yaml.ApiClient;
 import io.apisdk.example.yaml.models.Greeting;
 import io.kiota.http.jdk.JDKRequestAdapter;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 public class QuarkusKiotaResourceTest {
     @Inject Vertx vertx;
+
+    @Inject ObjectMapper mapper;
 
     @Test
     public void testHelloEndpoint() {
@@ -30,7 +33,7 @@ public class QuarkusKiotaResourceTest {
         // Arrange
         var adapter = new JDKRequestAdapter();
         adapter.setBaseUrl("http://localhost:8081");
-        ApiClient client = new ApiClient(adapter);
+        ApiClient client = new ApiClient(adapter, mapper);
 
         // Act
         Greeting result = client.quarkusKiota().get();

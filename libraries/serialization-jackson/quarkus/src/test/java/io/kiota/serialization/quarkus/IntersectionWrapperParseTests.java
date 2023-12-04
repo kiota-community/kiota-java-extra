@@ -2,6 +2,7 @@ package io.kiota.serialization.quarkus;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.kiota.serialization.json.quarkus.JsonParseNodeFactory;
 import io.kiota.serialization.json.quarkus.JsonSerializationWriterFactory;
 import io.kiota.serialization.quarkus.mocks.IntersectionTypeMock;
@@ -9,7 +10,6 @@ import io.kiota.serialization.quarkus.mocks.MyEnum;
 import io.kiota.serialization.quarkus.mocks.SecondTestEntity;
 import io.kiota.serialization.quarkus.mocks.TestEntity;
 import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -21,8 +21,10 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 class IntersectionWrapperParseTests {
 
-    @Inject JsonParseNodeFactory _parseNodeFactory;
-    @Inject JsonSerializationWriterFactory _serializationWriterFactory;
+    ObjectMapper mapper = new ObjectMapper();
+    JsonParseNodeFactory _parseNodeFactory = new JsonParseNodeFactory(mapper);
+    JsonSerializationWriterFactory _serializationWriterFactory =
+            new JsonSerializationWriterFactory(mapper);
     private static final String contentType = "application/json";
 
     @Test

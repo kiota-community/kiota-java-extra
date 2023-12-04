@@ -4,10 +4,10 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.apisdk.example.yaml.ApiClient;
 import io.apisdk.example.yaml.models.Greeting;
 import io.kiota.http.vertx.VertXRequestAdapter;
-import io.kiota.serialization.json.quarkus.JsonMapper;
 import io.quarkus.test.junit.QuarkusTest;
 import io.vertx.core.Vertx;
 import jakarta.inject.Inject;
@@ -16,8 +16,7 @@ import org.junit.jupiter.api.Test;
 @QuarkusTest
 public class QuarkusKiotaResourceTest {
     @Inject Vertx vertx;
-
-    @Inject JsonMapper mapper;
+    @Inject ObjectMapper mapper;
 
     @Test
     public void testHelloEndpoint() {
@@ -33,7 +32,7 @@ public class QuarkusKiotaResourceTest {
         // Arrange
         var adapter = new VertXRequestAdapter(vertx);
         adapter.setBaseUrl("http://localhost:8081");
-        ApiClient client = new ApiClient(adapter);
+        ApiClient client = new ApiClient(adapter, mapper);
 
         // Act
         Greeting result = client.quarkusKiota().get();

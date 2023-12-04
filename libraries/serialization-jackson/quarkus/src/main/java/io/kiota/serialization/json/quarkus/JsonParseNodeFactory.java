@@ -1,18 +1,18 @@
 package io.kiota.serialization.json.quarkus;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import jakarta.inject.Inject;
 
 public class JsonParseNodeFactory extends io.kiota.serialization.json.JsonParseNodeFactory {
 
-    @Inject JsonMapper mapper;
+    private ObjectMapper mapper;
 
-    public JsonParseNodeFactory(JsonMapper mapper) {
+    public JsonParseNodeFactory(ObjectMapper mapper) {
         this.mapper = mapper;
     }
 
     @Override
     protected ObjectReader getObjectReader() {
-        return mapper.getObjectReader();
+        return mapper.reader();
     }
 }
