@@ -33,7 +33,7 @@ public class QuarkusKiotaResourceTest {
         // Arrange
         var adapter = new JDKRequestAdapter();
         adapter.setBaseUrl("http://localhost:8081");
-        ApiClient client = new ApiClient(adapter, mapper);
+        ApiClient client = new ApiClient(adapter);
 
         // Act
         Greeting result = client.quarkusKiota().get();

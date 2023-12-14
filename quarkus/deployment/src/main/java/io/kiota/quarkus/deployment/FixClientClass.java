@@ -21,7 +21,6 @@ public class FixClientClass {
 
     public void fix() throws IOException {
         final SourceRoot source = new SourceRoot(generatedSourceFolder);
-        final SourceRoot dest = new SourceRoot(generatedSourceFolder);
 
         var parsed = source.tryToParse(packageName, clientName + ".java");
 
@@ -39,11 +38,11 @@ public class FixClientClass {
 
         cu.addImport("com.microsoft.kiota.serialization.SerializationWriterFactoryRegistry");
         cu.addImport("com.microsoft.kiota.serialization.ParseNodeFactoryRegistry");
-        cu.addImport("jakarta.inject.Inject");
-        cu.addImport("com.fasterxml.jackson.databind.ObjectMapper");
+        //        cu.addImport("jakarta.inject.Inject");
+        cu.addImport("io.quarkus.arc.Arc");
 
         // Add the object mapper to the contructor arguments
-        clientClass.getConstructors().get(0).addParameter("ObjectMapper", "mapper");
+        //        clientClass.getConstructors().get(0).addParameter("ObjectMapper", "mapper");
 
         var statements = constructorBody.getStatements();
 
@@ -76,13 +75,13 @@ public class FixClientClass {
                 new ExpressionStmt(
                         new NameExpr(
                                 "JsonSerializationWriterFactory jsonSerializationWriterFactory ="
-                                        + " new JsonSerializationWriterFactory(mapper)")));
+                                    + " Arc.container().instance(JsonSerializationWriterFactory.class).get()")));
         constructorBody.addStatement(
                 2,
                 new ExpressionStmt(
                         new NameExpr(
-                                "JsonParseNodeFactory jsonParseNodeFactory = new"
-                                        + " JsonParseNodeFactory(mapper)")));
+                                "JsonParseNodeFactory jsonParseNodeFactory ="
+                                    + " Arc.container().instance(JsonParseNodeFactory.class).get()")));
 
         source.saveAll();
     }
