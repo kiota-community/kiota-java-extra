@@ -36,20 +36,13 @@ public class FixClientClass {
         var clientClass = parsed.getResult().get().getClassByName(clientName).get();
         var constructorBody = clientClass.getConstructors().get(0).getBody();
 
-        cu.addImport("com.microsoft.kiota.serialization.SerializationWriterFactoryRegistry");
-        cu.addImport("com.microsoft.kiota.serialization.ParseNodeFactoryRegistry");
-        //        cu.addImport("jakarta.inject.Inject");
         cu.addImport("io.quarkus.arc.Arc");
-
-        // Add the object mapper to the contructor arguments
-        //        clientClass.getConstructors().get(0).addParameter("ObjectMapper", "mapper");
-
         var statements = constructorBody.getStatements();
 
         for (int i = 0; i < statements.size(); i++) {
             var stmt = statements.get(i);
 
-            // Fix up the reflective instantiation
+            // Fix up the instantiation of the factories using Arc
             if (stmt.toString().contains("JsonSerializationWriterFactory")) {
                 constructorBody.setStatement(
                         i,
@@ -64,8 +57,6 @@ public class FixClientClass {
                                 new NameExpr(
                                         "ParseNodeFactoryRegistry.defaultInstance.contentTypeAssociatedFactories.put(jsonParseNodeFactory.getValidContentType(),"
                                             + " jsonParseNodeFactory)")));
-            } else if (stmt.toString().contains("registerDefaultSerializer")) {
-                // TODO: we need to avoid reflection instantiating those
             }
         }
 
