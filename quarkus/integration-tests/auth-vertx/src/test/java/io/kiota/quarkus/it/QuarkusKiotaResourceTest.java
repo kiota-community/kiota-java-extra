@@ -2,7 +2,6 @@ package io.kiota.quarkus.it;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.apisdk.example.yaml.ApiClient;
 import io.apisdk.example.yaml.models.Greeting;
 import io.kiota.http.vertx.VertXRequestAdapter;
@@ -32,7 +31,6 @@ public class QuarkusKiotaResourceTest {
     String keycloakUrl;
 
     @Inject Vertx vertx;
-    @Inject ObjectMapper mapper;
 
     static final String CLIENT_ID = UUID.randomUUID().toString();
     static final String CLIENT_SECRET = UUID.randomUUID().toString();
