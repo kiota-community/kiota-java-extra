@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
+// This is a workaround until this Issue gets fixed: https://github.com/microsoft/kiota/issues/3796
 public class FixClientClass {
 
     private final String clientName;
