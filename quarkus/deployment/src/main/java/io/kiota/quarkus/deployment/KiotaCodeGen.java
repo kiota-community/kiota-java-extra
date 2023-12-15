@@ -149,6 +149,17 @@ public abstract class KiotaCodeGen implements CodeGenProvider {
                     context.outDir(),
                     context.shouldRedirectIO(),
                     context.config());
+            try {
+                new FixClientClass(
+                                KiotaCodeGenConfig.getClientClassName(
+                                        context.config(), spec.toFile().getName()),
+                                KiotaCodeGenConfig.getClientPackageName(
+                                        context.config(), spec.toFile().getName()),
+                                context.outDir())
+                        .fix();
+            } catch (IOException e) {
+                throw new CodeGenException("Failed to fix-up the client class code", e);
+            }
         }
 
         String folderHashAfter = getFolderMd5(context.outDir());

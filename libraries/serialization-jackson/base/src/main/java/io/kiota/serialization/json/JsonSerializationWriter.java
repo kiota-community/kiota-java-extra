@@ -2,6 +2,7 @@ package io.kiota.serialization.json;
 
 import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.microsoft.kiota.PeriodAndDuration;
 import com.microsoft.kiota.serialization.ComposedTypeWrapper;
 import com.microsoft.kiota.serialization.Parsable;
@@ -37,10 +38,9 @@ public class JsonSerializationWriter implements SerializationWriter {
     private final JsonGenerator generator;
 
     /** Creates a new instance of a json serialization writer */
-    public JsonSerializationWriter() {
+    public JsonSerializationWriter(ObjectWriter writer) {
         try {
-            this.generator =
-                    JsonMapper.mapper.writer().createGenerator(this.stream, JsonEncoding.UTF8);
+            this.generator = writer.createGenerator(this.stream, JsonEncoding.UTF8);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

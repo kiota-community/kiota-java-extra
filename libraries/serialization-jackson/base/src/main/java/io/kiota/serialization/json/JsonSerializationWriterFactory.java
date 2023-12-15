@@ -1,5 +1,6 @@
 package io.kiota.serialization.json;
 
+import com.fasterxml.jackson.databind.ObjectWriter;
 import com.microsoft.kiota.serialization.SerializationWriter;
 import com.microsoft.kiota.serialization.SerializationWriterFactory;
 import jakarta.annotation.Nonnull;
@@ -18,6 +19,10 @@ public class JsonSerializationWriterFactory implements SerializationWriterFactor
 
     private static final String validContentType = "application/json";
 
+    protected ObjectWriter getObjectWriter() {
+        return JsonMapper.mapper.writer();
+    }
+
     /** {@inheritDoc} */
     @Override
     @Nonnull
@@ -28,6 +33,6 @@ public class JsonSerializationWriterFactory implements SerializationWriterFactor
         } else if (!contentType.equals(validContentType)) {
             throw new IllegalArgumentException("expected a " + validContentType + " content type");
         }
-        return new JsonSerializationWriter();
+        return new JsonSerializationWriter(getObjectWriter());
     }
 }
