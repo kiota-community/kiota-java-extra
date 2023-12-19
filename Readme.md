@@ -152,12 +152,12 @@ To fine tune the generation you can define additional properties after the Open 
 
 | config | description |
 |---|---|
-| quarkus.kiota.<filename>.class-name | Specify the name for the generated client class |
-| quarkus.kiota.<filename>.package-name | Specify the name of the package for the generated sources |
-| quarkus.kiota.<filename>.include-path | Glob expression to identify the endpoint to be included in the generation |
-| quarkus.kiota.<filename>.exclude-path | Glob expression to identify the endpoint to be excluded in the generation |
-| quarkus.kiota.<filename>.serializer | Overwrite the serializers for the generation |
-| quarkus.kiota.<filename>.deserializer | Overwrite the deserializers for the generation |
+| quarkus.kiota.< filename >.class-name | Specify the name for the generated client class |
+| quarkus.kiota.< filename >.package-name | Specify the name of the package for the generated sources |
+| quarkus.kiota.< filename >.include-path | Glob expression to identify the endpoint to be included in the generation |
+| quarkus.kiota.< filename >.exclude-path | Glob expression to identify the endpoint to be excluded in the generation |
+| quarkus.kiota.< filename >.serializer | Overwrite the serializers for the generation |
+| quarkus.kiota.< filename >.deserializer | Overwrite the deserializers for the generation |
 
 Using the extension, by default, the Json serializer and deserializer will be based on Jackson instead of the official one based on Gson.
 

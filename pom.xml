@@ -35,6 +35,7 @@
     <module>libraries</module>
     <module>maven</module>
     <module>quarkus</module>
+    <module>docs</module>
   </modules>
 
   <scm>

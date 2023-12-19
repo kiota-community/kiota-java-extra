@@ -1,0 +1,23 @@
+With Kiota you can plug in any authentication mechanism provided by the underlying HTTP client.
+
+For example, when using the VertX HTTP client you can configure a Bearer Access Token with OIDC like:
+
+[source,java]
+----
+OAuth2Options options =
+        new OAuth2Options()
+                .setFlow(OAuth2FlowType.CLIENT)
+                .setClientId(CLIENT_ID)
+                .setTokenPath(keycloakUrl + "token")
+                .setClientSecret(CLIENT_SECRET);
+
+OAuth2Auth oAuth2Auth = OAuth2Auth.create(vertx, options);
+
+Oauth2Credentials oauth2Credentials = new Oauth2Credentials();
+
+OAuth2WebClient oAuth2WebClient =
+        OAuth2WebClient.create(WebClient.create(vertx), oAuth2Auth)
+                .withCredentials(oauth2Credentials);
+
+var adapter = new VertXRequestAdapter(oAuth2WebClient);
+----

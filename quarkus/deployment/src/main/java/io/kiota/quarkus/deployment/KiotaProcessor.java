@@ -4,7 +4,7 @@ import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
 
 class KiotaProcessor {
-    private static final String FEATURE = "quarkus-kiota";
+    private static final String FEATURE = "kiota";
 
     @BuildStep
     FeatureBuildItem feature() {

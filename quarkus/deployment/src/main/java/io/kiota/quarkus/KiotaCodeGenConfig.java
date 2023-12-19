@@ -3,6 +3,8 @@ package io.kiota.quarkus;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.logging.Log;
+import io.quarkus.runtime.annotations.ConfigGroup;
+import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 import java.io.IOException;
@@ -12,9 +14,13 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 import org.eclipse.microprofile.config.Config;
 
-@ConfigRoot(name = KiotaCodeGenConfig.KIOTA_CONFIG_PREFIX, phase = ConfigPhase.BUILD_TIME)
+// This configuration is read in codegen phase (before build time), the annotation is for
+// documentation
+// purposes and to avoid quarkus warnings
+@ConfigRoot(name = "kiota", phase = ConfigPhase.BUILD_TIME)
 public class KiotaCodeGenConfig {
     static final String KIOTA_CONFIG_PREFIX = "quarkus.kiota";
     // overwrite the automatically detected Operating System
@@ -55,6 +61,12 @@ public class KiotaCodeGenConfig {
                     "com.microsoft.kiota.serialization.FormParseNodeFactory");
     private static final String DESERIALIZER = ".deserializer";
 
+    /**
+     * Overrides the detected Operating System
+     */
+    @ConfigItem(name = "os")
+    public Optional<String> os;
+
     public static io.quarkus.utilities.OS getOs(final Config config) {
         String os = config.getConfigValue(OS).getValue();
         if (os == null) {
@@ -62,6 +74,12 @@ public class KiotaCodeGenConfig {
         }
         return io.quarkus.utilities.OS.valueOf(os);
     }
+
+    /**
+     * Overrides the detected Architecture
+     */
+    @ConfigItem(name = "arch")
+    public Optional<String> arch;
 
     public static String getArch(final Config config) {
         String arch = config.getConfigValue(ARCH).getValue();
@@ -71,9 +89,22 @@ public class KiotaCodeGenConfig {
         return arch;
     }
 
+    /**
+     * The path to a kiota executable location to be used.
+     * When set, the kiota version is not going to be checked/used.
+     */
+    @ConfigItem(name = "provided")
+    public Optional<String> provided;
+
     public static String getProvided(final Config config) {
         return config.getConfigValue(PROVIDED).getValue();
     }
+
+    /**
+     * The path to a kiota executable location to be used
+     */
+    @ConfigItem(name = "release.url", defaultValue = DEFAULT_RELEASE_URL)
+    public Optional<String> releaseUrl;
 
     public static String getReleaseUrl(final Config config) {
         String releaseUrl = config.getConfigValue(RELEASE_URL).getValue();
@@ -82,6 +113,14 @@ public class KiotaCodeGenConfig {
         }
         return DEFAULT_RELEASE_URL;
     }
+
+    /**
+     * The kiota version to be used.
+     * If not provided we are going to try to resolve "latest" from the GitHub API.
+     * Please, set this property in any production grade project.
+     */
+    @ConfigItem(name = "version")
+    public Optional<String> version;
 
     public static String getVersion(final Config config) {
         String version = config.getConfigValue(VERSION).getValue();
@@ -141,6 +180,68 @@ public class KiotaCodeGenConfig {
         return version;
     }
 
+    /**
+     * The timeout to be used when running the kiota CLI.
+     */
+    @ConfigItem(name = "timeout", defaultValue = "" + DEFAULT_TIMEOUT)
+    public Optional<String> timeout;
+
+    public static int getTimeout(final Config config) {
+        String timeout = config.getConfigValue(TIMEOUT).getValue();
+        if (timeout != null) {
+            return Integer.valueOf(timeout);
+        }
+        return DEFAULT_TIMEOUT;
+    }
+
+    /**
+     * Configuration resolved based on the OpenAPI description file name
+     */
+    @ConfigItem(name = "spec-name")
+    public Optional<SpecConfig> specName;
+
+    @ConfigGroup
+    public static final class SpecConfig {
+
+        /**
+         * The generated API client class name.
+         */
+        @ConfigItem(name = "class-name", defaultValue = DEFAULT_CLIENT_NAME)
+        public Optional<String> className;
+
+        /**
+         * The generated API client package name.
+         */
+        @ConfigItem(name = "package-name", defaultValue = DEFAULT_CLIENT_PACKAGE)
+        public Optional<String> packageName;
+
+        /**
+         * The glob expression to be used to identify the endpoints to be included in the generation.
+         */
+        @ConfigItem(name = "include-path")
+        public Optional<String> includePath;
+
+        /**
+         * The glob expression to be used to identify the endpoints to be excluded from the generation.
+         */
+        @ConfigItem(name = "exclude-path")
+        public Optional<String> excludePath;
+
+        /**
+         * ADVANCED:
+         * The serializers to be used in the generated code.
+         */
+        @ConfigItem(name = "serializer")
+        public Optional<List<String>> serializer;
+
+        /**
+         * ADVANCED:
+         * The deserializers to be used in the generated code.
+         */
+        @ConfigItem(name = "deserializer")
+        public Optional<List<String>> deserializer;
+    }
+
     public static String getClientClassName(final Config config, String filename) {
         String clientName =
                 config.getConfigValue(KIOTA_CONFIG_PREFIX + "." + filename + CLIENT_CLASS_NAME)
@@ -188,13 +289,5 @@ public class KiotaCodeGenConfig {
             return List.of(deserializer.split(","));
         }
         return DEFAULT_DESERIALIZER;
-    }
-
-    public static int getTimeout(final Config config) {
-        String timeout = config.getConfigValue(TIMEOUT).getValue();
-        if (timeout != null) {
-            return Integer.valueOf(timeout);
-        }
-        return DEFAULT_TIMEOUT;
     }
 }
