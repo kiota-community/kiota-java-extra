@@ -1,0 +1,116 @@
+
+First of all you need to add or update the `quarkus-maven-plugin` configuration with the following:
+
+[source,xml,subs=+quotes]
+----
+<plugin>
+  <groupId>io.quarkus</groupId>
+  <artifactId>quarkus-maven-plugin</artifactId>
+  <extensions>true</extensions>
+  <executions>
+    <execution>
+      <goals>
+        <goal>build</goal>
+        *<goal>generate-code</goal>*
+      </goals>
+    </execution>
+  </executions>
+</plugin>
+----
+
+Add the extension dependency to your project's `pom.xml` file:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>quarkus-kiota</artifactId>
+  <version>{project.version}</version>
+</dependency>
+----
+
+Now, create a new folder named `openapi` under `src/main/` and add OpenAPI spec files there. Supported file extensions are: `json`, `yaml`, `yml`.
+
+To fine tune the configuration for each spec file, add the following entry to your properties file. In this example, our spec file is in `src/main/openapi/petstore.json`:
+
+[source,properties]
+----
+quarkus.kiota.petstore.json.package-name=com.mycompany
+----
+
+If a base package name is not provided, it will be used the default `io.apisdk.<filename>`. For example, `io.apisdk.petstore.json`.
+
+You can customize the name of Api Client class using the following property:
+
+[source,properties]
+----
+quarkus.kiota.petstore.json.class-name=MyApiClient
+----
+
+Now add the additional dependencies to compile the project:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+  <groupId>com.microsoft.kiota</groupId>
+  <artifactId>microsoft-kiota-abstractions</artifactId>
+  <version>${kiota.libs.version}</version>
+</dependency>
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>kiota-http-vertx</artifactId> <!-- alternatively <artifactId>kiota-http-jdk</artifactId> -->
+  <version>{version}</version>
+</dependency>
+<dependency>
+  <groupId>io.kiota</groupId>
+  <artifactId>kiota-serialization-jackson-quarkus</artifactId>
+  <version>{version}</version>
+</dependency>
+<dependency>
+  <groupId>com.microsoft.kiota</groupId>
+  <artifactId>microsoft-kiota-serialization-text</artifactId>
+  <version>${kiota.libs.version}</version>
+</dependency>
+<dependency>
+  <groupId>com.microsoft.kiota</groupId>
+  <artifactId>microsoft-kiota-serialization-form</artifactId>
+  <version>${kiota.libs.version}</version>
+</dependency>
+<dependency>
+  <groupId>com.microsoft.kiota</groupId>
+  <artifactId>microsoft-kiota-serialization-multipart</artifactId>
+  <version>${kiota.libs.version}</version>
+</dependency>
+<dependency>
+  <groupId>jakarta.annotation</groupId>
+  <artifactId>jakarta.annotation-api</artifactId>
+</dependency>
+----
+
+Running `mvn compile` generates your classes under the `target/generated-sources/kiota` folder.
+You can reference and use the generated code in your project, for example:
+
+[source, java]
+----
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+
+import io.apisdk.petstore.json.ApiClient;
+import io.kiota.http.vertx.VertXRequestAdapter;
+import io.vertx.core.Vertx;
+
+@Produces(MediaType.APPLICATION_JSON)
+@Path("/petstore")
+public class PetResource {
+
+  @Inject Vertx vertx;
+
+  RequestAdapter adapter = new VertXRequestAdapter(vertx);
+  ApiClient client = new ApiClient(adapter);
+}
+----
+
+See the https://github.com/kiota-community/kiota-java-extra/tree/main/quarkus/integration-tests[integration-tests] module for more information of how to use this extension. Please be advised that the extension is on experimental, early development stage.

@@ -1,0 +1,221 @@
+
+:summaryTableId: quarkus-kiota
+[.configuration-legend]
+icon:lock[title=Fixed at build time] Configuration property fixed at build time - All other configuration properties are overridable at runtime
+[.configuration-reference.searchable, cols="80,.^10,.^10"]
+|===
+
+h|[[quarkus-kiota_configuration]]link:#quarkus-kiota_configuration[Configuration property]
+
+h|Type
+h|Default
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.os]]`link:#quarkus-kiota_quarkus.kiota.os[quarkus.kiota.os]`
+
+
+[.description]
+--
+Overrides the detected Operating System
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_OS+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_OS+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.arch]]`link:#quarkus-kiota_quarkus.kiota.arch[quarkus.kiota.arch]`
+
+
+[.description]
+--
+Overrides the detected Architecture
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_ARCH+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_ARCH+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.provided]]`link:#quarkus-kiota_quarkus.kiota.provided[quarkus.kiota.provided]`
+
+
+[.description]
+--
+The path to a kiota executable location to be used. When set, the kiota version is not going to be checked/used.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_PROVIDED+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_PROVIDED+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.release.url]]`link:#quarkus-kiota_quarkus.kiota.release.url[quarkus.kiota.release.url]`
+
+
+[.description]
+--
+The path to a kiota executable location to be used
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_RELEASE_URL+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_RELEASE_URL+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`https://github.com/microsoft/kiota/releases`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.version]]`link:#quarkus-kiota_quarkus.kiota.version[quarkus.kiota.version]`
+
+
+[.description]
+--
+The kiota version to be used. If not provided we are going to try to resolve "latest" from the GitHub API. Please, set this property in any production grade project.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_VERSION+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_VERSION+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.timeout]]`link:#quarkus-kiota_quarkus.kiota.timeout[quarkus.kiota.timeout]`
+
+
+[.description]
+--
+The timeout to be used when running the kiota CLI.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_TIMEOUT+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_TIMEOUT+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`30`
+
+
+h|[[quarkus-kiota_quarkus.kiota.spec-name-configuration-resolved-based-on-the-openapi-description-file-name]]link:#quarkus-kiota_quarkus.kiota.spec-name-configuration-resolved-based-on-the-openapi-description-file-name[Configuration resolved based on the OpenAPI description file name]
+This configuration section is optional
+h|Type
+h|Default
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.spec-name.class-name]]`link:#quarkus-kiota_quarkus.kiota.spec-name.class-name[quarkus.kiota.spec-name.class-name]`
+
+
+[.description]
+--
+The generated API client class name.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_SPEC_NAME_CLASS_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_SPEC_NAME_CLASS_NAME+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`ApiClient`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.spec-name.package-name]]`link:#quarkus-kiota_quarkus.kiota.spec-name.package-name[quarkus.kiota.spec-name.package-name]`
+
+
+[.description]
+--
+The generated API client package name.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_SPEC_NAME_PACKAGE_NAME+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_SPEC_NAME_PACKAGE_NAME+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|`io.apisdk`
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.spec-name.include-path]]`link:#quarkus-kiota_quarkus.kiota.spec-name.include-path[quarkus.kiota.spec-name.include-path]`
+
+
+[.description]
+--
+The glob expression to be used to identify the endpoints to be included in the generation.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_SPEC_NAME_INCLUDE_PATH+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_SPEC_NAME_INCLUDE_PATH+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.spec-name.exclude-path]]`link:#quarkus-kiota_quarkus.kiota.spec-name.exclude-path[quarkus.kiota.spec-name.exclude-path]`
+
+
+[.description]
+--
+The glob expression to be used to identify the endpoints to be excluded from the generation.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_SPEC_NAME_EXCLUDE_PATH+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_SPEC_NAME_EXCLUDE_PATH+++`
+endif::add-copy-button-to-env-var[]
+--|string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.spec-name.serializer]]`link:#quarkus-kiota_quarkus.kiota.spec-name.serializer[quarkus.kiota.spec-name.serializer]`
+
+
+[.description]
+--
+ADVANCED: The serializers to be used in the generated code.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_SPEC_NAME_SERIALIZER+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_SPEC_NAME_SERIALIZER+++`
+endif::add-copy-button-to-env-var[]
+--|list of string 
+|
+
+
+a|icon:lock[title=Fixed at build time] [[quarkus-kiota_quarkus.kiota.spec-name.deserializer]]`link:#quarkus-kiota_quarkus.kiota.spec-name.deserializer[quarkus.kiota.spec-name.deserializer]`
+
+
+[.description]
+--
+ADVANCED: The deserializers to be used in the generated code.
+
+ifdef::add-copy-button-to-env-var[]
+Environment variable: env_var_with_copy_button:+++QUARKUS_KIOTA_SPEC_NAME_DESERIALIZER+++[]
+endif::add-copy-button-to-env-var[]
+ifndef::add-copy-button-to-env-var[]
+Environment variable: `+++QUARKUS_KIOTA_SPEC_NAME_DESERIALIZER+++`
+endif::add-copy-button-to-env-var[]
+--|list of string 
+|
+
+|===

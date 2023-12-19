@@ -1,0 +1,23 @@
+= Quarkus - Kiota
+:extension-status: preview
+
+Quarkus' extension for generation of fully typed, client side SDKs based on OpenAPI specification files.
+
+This extension is based on the https://learn.microsoft.com/en-gb/openapi/kiota/[Microsoft Kiota] generator.
+
+**Want to contribute? Great!** We try to make it easy, and all contributions, even the smaller ones, are more than welcome. This includes bug reports, fixes, documentation, examples... But first, read https://github.com/kiota-community/kiota-java-extra/blob/main/CONTRIBUTING.md[this page].
+
+[[getting-started]]
+== Getting Started
+
+include::./includes/getting-started.adoc[leveloffset=+1, opts=optional]
+
+[[authentication-support]]
+== Authentication Support
+
+include::./includes/authentication-support.adoc[leveloffset=+1, opts=optional]
+
+[[full-configuration]]
+== Full configuration
+
+include::./includes/quarkus-kiota.adoc[leveloffset=+1, opts=optional]

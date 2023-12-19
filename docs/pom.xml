@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>io.kiota</groupId>
+    <artifactId>kiota-java-extra-parent</artifactId>
+    <version>999-SNAPSHOT</version>
+  </parent>
+  <artifactId>quarkus-kiota-docs</artifactId>
+  <name>Quarkus Kiota - Documentation</name>
+
+  <dependencies>
+    <!-- Make sure the doc is built after the other artifacts -->
+    <dependency>
+      <groupId>io.kiota</groupId>
+      <artifactId>quarkus-kiota-deployment</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>read-project-properties</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <files>${project.basedir}/../pom.xml</files>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>generate-resources</phase>
+            <configuration>
+              <outputDirectory>${project.basedir}/modules/ROOT/pages/includes/</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.basedir}/../target/asciidoc/generated/config</directory>
+                  <include>quarkus-kiota.adoc</include>
+                  <filtering>false</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+</project>
