@@ -74,7 +74,7 @@ public class JsonParseNode implements ParseNode {
 
     @Nullable
     public Short getShortValue() {
-        return currentNode.isShort() ? currentNode.shortValue() : null;
+        return currentNode.canConvertToInt() ? currentNode.shortValue() : null;
     }
 
     @Nullable
@@ -84,12 +84,12 @@ public class JsonParseNode implements ParseNode {
 
     @Nullable
     public Integer getIntegerValue() {
-        return currentNode.isInt() ? currentNode.intValue() : null;
+        return currentNode.canConvertToInt() ? currentNode.intValue() : null;
     }
 
     @Nullable
     public Float getFloatValue() {
-        if (currentNode.isFloat()) {
+        if (currentNode.isNumber()) {
             double doubleValue = currentNode.doubleValue();
             if (doubleValue >= Float.MIN_VALUE && doubleValue <= Float.MAX_VALUE) {
                 return Double.valueOf(doubleValue).floatValue();
@@ -100,12 +100,12 @@ public class JsonParseNode implements ParseNode {
 
     @Nullable
     public Double getDoubleValue() {
-        return currentNode.isFloatingPointNumber() ? currentNode.doubleValue() : null;
+        return currentNode.isNumber() ? currentNode.doubleValue() : null;
     }
 
     @Nullable
     public Long getLongValue() {
-        return currentNode.isLong() ? currentNode.longValue() : null;
+        return currentNode.canConvertToLong() ? currentNode.longValue() : null;
     }
 
     @Nullable
