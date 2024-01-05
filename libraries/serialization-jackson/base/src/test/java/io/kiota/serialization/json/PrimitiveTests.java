@@ -43,10 +43,10 @@ public class PrimitiveTests {
         // Assert
         assertEquals(123, intValue);
         assertEquals(123L, longValue);
-        assertEquals((short)123, shortValue);
+        assertEquals((short) 123, shortValue);
         assertEquals(123.0, doubleValue);
         assertEquals(123.0f, floatValue);
         assertEquals(new BigDecimal(123), bigDecValue);
-        assertEquals((byte)123, byteValue);
+        assertEquals((byte) 123, byteValue);
     }
 }
