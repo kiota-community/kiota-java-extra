@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.kiota</groupId>
   <artifactId>kiota-java-extra-parent</artifactId>
-  <version>0.0.10</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>Kiota Java Extra</name>
   <description>Utilities for Java SDKs using Kiota</description>
