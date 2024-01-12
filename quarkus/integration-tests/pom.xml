@@ -15,6 +15,7 @@
     <module>basic-vertx</module>
     <module>auth-vertx</module>
     <module>rename</module>
+    <module>native-image</module>
   </modules>
   <properties>
     <skipITs>true</skipITs>
