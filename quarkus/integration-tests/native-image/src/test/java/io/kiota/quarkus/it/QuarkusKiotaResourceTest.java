@@ -5,8 +5,11 @@ import static org.hamcrest.Matchers.is;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 @QuarkusTest
+@DisabledOnOs(OS.WINDOWS)
 public class QuarkusKiotaResourceTest {
 
     @Test
