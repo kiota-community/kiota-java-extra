@@ -39,7 +39,8 @@ public class QuarkusKiotaResource2 {
         adapter.setBaseUrl("http://localhost:8081");
         ApiClient client = new ApiClient(adapter);
 
-        io.apisdk.example.yaml.models.Greeting result = client.quarkusKiota().get();
+        io.apisdk.example.yaml.models.Greeting result =
+                client.quarkusKiota().get(config -> config.queryParameters.name = "myself");
 
         return new Greeting(result.getValue());
     }

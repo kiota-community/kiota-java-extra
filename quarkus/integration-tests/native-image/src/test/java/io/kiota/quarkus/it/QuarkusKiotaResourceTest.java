@@ -12,15 +12,10 @@ public class QuarkusKiotaResourceTest {
     @Test
     public void testHelloEndpoint() {
         given().when()
-                .get("/quarkus-kiota")
+                .get("/quarkus-kiota?name=me")
                 .then()
                 .statusCode(200)
-                .body(is("{\"value\":\"Hello quarkus-kiota\"}"));
-        given().when()
-                .get("/quarkus-kiota2")
-                .then()
-                .statusCode(200)
-                .body(is("{\"value\":\"Hello quarkus-kiota\"}"));
+                .body(is("{\"value\":\"Hello quarkus-kiota me\"}"));
     }
 
     @Test
@@ -29,6 +24,6 @@ public class QuarkusKiotaResourceTest {
                 .get("/quarkus-kiota2")
                 .then()
                 .statusCode(200)
-                .body(is("{\"value\":\"Hello quarkus-kiota\"}"));
+                .body(is("{\"value\":\"Hello quarkus-kiota myself\"}"));
     }
 }

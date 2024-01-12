@@ -20,6 +20,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 @Path("/quarkus-kiota")
@@ -29,7 +30,7 @@ public class QuarkusKiotaResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Greeting hello() {
-        return new Greeting("Hello quarkus-kiota");
+    public Greeting hello(@QueryParam("name") String name) {
+        return new Greeting("Hello quarkus-kiota " + name);
     }
 }
