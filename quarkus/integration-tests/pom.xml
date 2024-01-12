@@ -51,7 +51,9 @@
     <profile>
       <id>non-windows</id>
       <activation>
-        <os><family>!Windows</family></os>
+        <os>
+          <family>!Windows</family>
+        </os>
       </activation>
       <modules>
         <module>000</module>
@@ -65,7 +67,9 @@
     <profile>
       <id>windows</id>
       <activation>
-          <os><family>Windows</family></os>
+        <os>
+          <family>Windows</family>
+        </os>
       </activation>
       <modules>
         <module>000</module>
