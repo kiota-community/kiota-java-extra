@@ -9,13 +9,6 @@
   <artifactId>quarkus-kiota-integration-tests-parent</artifactId>
   <packaging>pom</packaging>
   <name>Quarkus Kiota - Integration Tests - Parent</name>
-  <modules>
-    <module>000</module>
-    <module>basic-jdk</module>
-    <module>basic-vertx</module>
-    <module>auth-vertx</module>
-    <module>rename</module>
-  </modules>
   <properties>
     <skipITs>true</skipITs>
   </properties>
@@ -55,6 +48,37 @@
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>non-windows</id>
+      <activation>
+        <os>
+          <family>!Windows</family>
+        </os>
+      </activation>
+      <modules>
+        <module>000</module>
+        <module>basic-jdk</module>
+        <module>basic-vertx</module>
+        <module>auth-vertx</module>
+        <module>rename</module>
+        <module>native-image</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <modules>
+        <module>000</module>
+        <module>basic-jdk</module>
+        <module>basic-vertx</module>
+        <module>auth-vertx</module>
+        <module>rename</module>
+      </modules>
+    </profile>
     <profile>
       <id>native-image</id>
       <activation>

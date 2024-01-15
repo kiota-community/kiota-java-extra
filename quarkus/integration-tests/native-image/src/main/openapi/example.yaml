@@ -1,0 +1,30 @@
+openapi: 3.0.0
+info:
+  title: Test
+  version: 1.0.0
+  description: quarkus kiota integration test
+paths:
+  /quarkus-kiota:
+    get:
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          required: false
+          description: The name to be used
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Greeting"
+          description: Test
+      description: Returns an hello world
+components:
+  schemas:
+    Greeting:
+      type: object
+      properties:
+        value:
+          type: string
