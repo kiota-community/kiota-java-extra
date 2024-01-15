@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-java-extra-parent</artifactId>
-    <version>0.0.11</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>quarkus-kiota-docs</artifactId>
   <name>Quarkus Kiota - Documentation</name>

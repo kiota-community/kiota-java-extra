@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>quarkus-kiota-integration-tests-parent</artifactId>
-    <version>0.0.11</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>quarkus-kiota-integration-tests-000</artifactId>
   <name>Quarkus Kiota - Integration Tests - 000</name>
