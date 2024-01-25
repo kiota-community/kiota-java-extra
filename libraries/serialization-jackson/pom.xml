@@ -5,12 +5,12 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-libraries-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.14</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>kiota-serialization-jackson-parent</artifactId>
-  <version>999-SNAPSHOT</version>
+  <version>0.0.14</version>
   <packaging>pom</packaging>
 
   <description>Jackson serialization libraries for Kiota</description>
