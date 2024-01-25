@@ -7,7 +7,7 @@
   <packaging>pom</packaging>
   <name>Kiota Java Extra</name>
   <description>Utilities for Java SDKs using Kiota</description>
-  <url>https://github.com/redhat-developer/kiota-java-extra</url>
+  <url>https://github.com/kiota-community/kiota-java-extra</url>
 
   <organization>
     <name>Kiota Community</name>
@@ -34,8 +34,6 @@
   <modules>
     <module>libraries</module>
     <module>maven</module>
-    <module>quarkus</module>
-    <module>docs</module>
   </modules>
 
   <scm>
