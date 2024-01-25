@@ -109,57 +109,9 @@ Available parameters:
 
 ## Quarkus extension
 
-If you have a supersonic, subatomic [Quarkus](https://quarkus.io/) project you can use this extension to generate code with Kiota:
+The Quarkus extension now lives in the Quarkiverse organization:
 
-```xml
-<dependency>
-  <groupId>io.kiota</groupId>
-  <artifactId>quarkus-kiota</artifactId>
-  <version>VERSION</version>
-</dependency>
-```
-
-remember to enable the code generation in the `quarkus-maven-plugin` configuration, if not already present, add `<goal>generate-code</goal>`:
-
-```xml
-<plugin>
-  <groupId>io.quarkus</groupId>
-  <artifactId>quarkus-maven-plugin</artifactId>
-  <executions>
-    <execution>
-      <goals>
-        <goal>build</goal>
-        <goal>generate-code</goal>
-      </goals>
-    </execution>
-  </executions>
-</plugin>
-```
-
-now you can drop any Open API specification in the `src/<scope>/openapi` folder and configure the extension as usual with Quarkus configuration.
-We highly encourage you to pin `quarkus.kiota.version` to a specific version instead of relying on the "latest detection" built-in mechanism for production code.
-
-| config | description |
-|---|---|
-| quarkus.kiota.os | Override the detected Operating System |
-| quarkus.kiota.arch | Override the detected Architecture |
-| quarkus.kiota.provided | Specify the path to an available Kiota CLI to be used |
-| quarkus.kiota.release.url | Define an alternative URL to be used to download the Kiota CLI |
-| quarkus.kiota.version | Define a specific Kiota version to be used |
-| quarkus.kiota.timeout | Global timeout over the execution of the Kiota CLI |
-
-To fine tune the generation you can define additional properties after the Open API spec file name:
-
-| config | description |
-|---|---|
-| quarkus.kiota.< filename >.class-name | Specify the name for the generated client class |
-| quarkus.kiota.< filename >.package-name | Specify the name of the package for the generated sources |
-| quarkus.kiota.< filename >.include-path | Glob expression to identify the endpoint to be included in the generation |
-| quarkus.kiota.< filename >.exclude-path | Glob expression to identify the endpoint to be excluded in the generation |
-| quarkus.kiota.< filename >.serializer | Overwrite the serializers for the generation |
-| quarkus.kiota.< filename >.deserializer | Overwrite the deserializers for the generation |
-
-Using the extension, by default, the Json serializer and deserializer will be based on Jackson instead of the official one based on Gson.
+https://github.com/quarkiverse/quarkus-kiota
 
 ## Libraries
 
