@@ -69,7 +69,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "1.10.1")
+    @Parameter(defaultValue = "1.11.1")
     private String kiotaVersion;
 
     // Kiota Options
@@ -111,6 +111,16 @@ public class KiotaMojo extends AbstractMojo {
             defaultValue =
                     "io.kiota.serialization.json.JsonParseNodeFactory,com.microsoft.kiota.serialization.TextParseNodeFactory,com.microsoft.kiota.serialization.FormParseNodeFactory")
     private List<String> deserializers;
+
+    /**
+     * The includePath to be used by kiota
+     */
+    @Parameter() private List<String> includePath;
+
+    /**
+     * The excludePath to be used by kiota
+     */
+    @Parameter() private List<String> excludePath;
 
     private File finalTargetDirectory() {
         Path namespaceResolver = targetDirectory.toPath();
@@ -324,6 +334,18 @@ public class KiotaMojo extends AbstractMojo {
         for (String deserializer : deserializers) {
             cmd.add("--deserializer");
             cmd.add(deserializer);
+        }
+        if (includePath != null) {
+            for (String i : includePath) {
+                cmd.add("--include-path");
+                cmd.add(i);
+            }
+        }
+        if (excludePath != null) {
+            for (String e : excludePath) {
+                cmd.add("--exclude-path");
+                cmd.add(e);
+            }
         }
         cmd.add("--clean-output");
         cmd.add(cleanOutput);
