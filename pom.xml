@@ -61,7 +61,7 @@
     <maven-plugin-plugin.version>3.12.0</maven-plugin-plugin.version>
     <versions-maven-plugin.version>2.16.2</versions-maven-plugin.version>
     <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
-    <maven-gpg-plugin.version>3.2.2</maven-gpg-plugin.version>
+    <maven-gpg-plugin.version>3.2.3</maven-gpg-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <quarkus.version>3.9.3</quarkus.version>
