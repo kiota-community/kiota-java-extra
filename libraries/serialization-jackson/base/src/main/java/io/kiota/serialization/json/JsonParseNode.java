@@ -312,6 +312,8 @@ public class JsonParseNode implements ParseNode {
         else if (element.isValueNode()) {
             if (element.isBoolean()) return element.booleanValue();
             else if (element.isTextual()) return element.textValue();
+            else if (element.isInt()) return element.intValue();
+            else if (element.isLong()) return element.longValue();
             else if (element.isFloatingPointNumber() && element.isFloat())
                 return element.floatValue();
             else if (element.isFloatingPointNumber() && element.isDouble())
