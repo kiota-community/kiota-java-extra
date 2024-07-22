@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-libraries-parent</artifactId>
-    <version>0.0.18</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>kiota-http-jdk</artifactId>
   <name>Kiota - Http - JDK</name>
