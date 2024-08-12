@@ -101,7 +101,7 @@ public class KiotaMojo extends AbstractMojo {
      */
     @Parameter(
             defaultValue =
-                    "io.kiota.serialization.json.JsonSerializationWriterFactory,com.microsoft.kiota.serialization.TextSerializationWriterFactory,com.microsoft.kiota.serialization.FormSerializationWriterFactory,com.microsoft.kiota.serialization.MultipartSerializationWriterFactory")
+                    "com.microsoft.kiota.serialization.JsonSerializationWriterFactory,com.microsoft.kiota.serialization.TextSerializationWriterFactory,com.microsoft.kiota.serialization.FormSerializationWriterFactory,com.microsoft.kiota.serialization.MultipartSerializationWriterFactory")
     private List<String> serializers;
 
     /**
@@ -109,7 +109,7 @@ public class KiotaMojo extends AbstractMojo {
      */
     @Parameter(
             defaultValue =
-                    "io.kiota.serialization.json.JsonParseNodeFactory,com.microsoft.kiota.serialization.TextParseNodeFactory,com.microsoft.kiota.serialization.FormParseNodeFactory")
+                    "com.microsoft.kiota.serialization.JsonParseNodeFactory,com.microsoft.kiota.serialization.TextParseNodeFactory,com.microsoft.kiota.serialization.FormParseNodeFactory")
     private List<String> deserializers;
 
     /**
