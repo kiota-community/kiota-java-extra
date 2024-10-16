@@ -66,7 +66,7 @@
         <configuration>
           <namespace>com.github.api</namespace>
           <clientClass>GitHubClient</clientClass>
-          <url>https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json</url>
+          <url>https://raw.githubusercontent.com/github/rest-api-description/129d610a96aaa0eb10627a3a8078708997d4512b/descriptions/api.github.com/api.github.com.json</url>
           <excludePath>/repos/{template_owner}/{template_repo}/generate</excludePath>
         </configuration>
         <executions>
