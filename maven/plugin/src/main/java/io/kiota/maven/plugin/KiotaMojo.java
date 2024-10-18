@@ -63,7 +63,9 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Base URL to be used for the download
      */
-    @Parameter(defaultValue = "https://github.com/microsoft/kiota/releases/download")
+    @Parameter(
+            defaultValue = "https://github.com/microsoft/kiota/releases/download",
+            property = "kiota.baseURL")
     private String baseURL;
 
     /**
