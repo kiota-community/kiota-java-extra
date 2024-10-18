@@ -5,7 +5,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-maven-plugin-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.19</version>
   </parent>
 
   <artifactId>kiota-maven-plugin-it</artifactId>
