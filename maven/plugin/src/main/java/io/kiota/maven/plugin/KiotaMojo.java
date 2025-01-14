@@ -71,7 +71,7 @@ public class KiotaMojo extends AbstractMojo {
     /**
      * Version of Kiota to be used
      */
-    @Parameter(defaultValue = "1.14.0")
+    @Parameter(defaultValue = "1.22.2")
     private String kiotaVersion;
 
     // Kiota Options
