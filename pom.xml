@@ -66,7 +66,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <quarkus.version>3.18.1</quarkus.version>
     <kiota.libs.version>1.8.2</kiota.libs.version>
-    <spotless.version>2.44.2</spotless.version>
+    <spotless.version>2.44.3</spotless.version>
   </properties>
   <dependencyManagement>
     <dependencies>
