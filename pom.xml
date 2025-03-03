@@ -65,7 +65,7 @@
     <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <quarkus.version>3.19.1</quarkus.version>
-    <kiota.libs.version>1.8.3</kiota.libs.version>
+    <kiota.libs.version>1.8.4</kiota.libs.version>
     <spotless.version>2.44.3</spotless.version>
   </properties>
   <dependencyManagement>
