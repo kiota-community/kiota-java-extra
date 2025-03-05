@@ -57,8 +57,11 @@ public class KiotaMojo extends AbstractMojo {
     @Parameter(defaultValue = "${os.name}")
     private String osName;
 
-    // Eventually make this configurable
-    private String osArch = "x64";
+    /**
+     * OS arch
+     */
+    @Parameter(defaultValue = "${os.arch}")
+    private String osArch;
 
     /**
      * Base URL to be used for the download
@@ -388,33 +391,93 @@ public class KiotaMojo extends AbstractMojo {
         }
     }
 
-    private static class KiotaParams {
-        final String osName;
-        final String osArch;
+    private enum Os {
+        LINUX("linux", "kiota"),
+        OSX("osx", "kiota"),
+        WINDOWS("win", "kiota.exe");
 
-        public KiotaParams(String osName, String osArch) {
-            this.osName = osName.toLowerCase(Locale.ROOT);
-            this.osArch = osArch;
+        private final String osString;
+        private final String binary;
+
+        Os(String osString, String binary) {
+            this.osString = osString;
+            this.binary = binary;
+        }
+
+        public static Os parse(String rawOsString) {
+            rawOsString = rawOsString.toLowerCase(Locale.ROOT);
+            if (rawOsString.startsWith("linux")) {
+                return LINUX;
+            }
+            if (rawOsString.startsWith("osx") || rawOsString.startsWith("mac")) {
+                return OSX;
+            }
+            if (rawOsString.startsWith("win")) {
+                return WINDOWS;
+            }
+            throw new IllegalArgumentException(
+                    "Detected OS is not recognized or supported: " + rawOsString);
+        }
+
+        public String getOsString() {
+            return osString;
+        }
+
+        public String getBinary() {
+            return binary;
+        }
+    }
+
+    private enum Arch {
+        ARM64("arm64"),
+        X64("x64"),
+        X86("x86");
+
+        private final String archString;
+
+        Arch(String arch) {
+            this.archString = arch;
+        }
+
+        public static Arch parse(String rawArchString) {
+            // See
+            // https://github.com/trustin/os-maven-plugin/blob/os-maven-plugin-1.7.1/src/main/java/kr/motd/maven/os/Detector.java#L192 (Apache License 2.0).
+            rawArchString = rawArchString.toLowerCase(Locale.ROOT);
+            if ("aarch64".equals(rawArchString)) {
+                return ARM64;
+            }
+            if (rawArchString.matches("^(x8664|amd64|ia32e|em64t|x64)$")) {
+                return X64;
+            }
+            if (rawArchString.matches("^(x8632|x86|i[3-6]86|ia32|x32)$")) {
+                return X86;
+            }
+            throw new IllegalArgumentException(
+                    "Detected processor architecture is not recognized or supported: "
+                            + rawArchString);
+        }
+
+        public String getArchString() {
+            return archString;
+        }
+    }
+
+    private static class KiotaParams {
+
+        private final Os os;
+        private final Arch arch;
+
+        public KiotaParams(String rawOsString, String rawArchString) {
+            os = Os.parse(rawOsString);
+            arch = Arch.parse(rawArchString);
         }
 
         public String downloadArtifact() {
-            if (osName.startsWith("mac") || osName.startsWith("osx")) {
-                return "osx-x64";
-            } else if (osName.startsWith("windows")) {
-                return "win-x64";
-            } else if (osName.startsWith("linux")) {
-                return "linux-x64";
-            } else {
-                throw new IllegalArgumentException("Detected OS is not supported: " + osName);
-            }
+            return os.getOsString() + "-" + arch.getArchString();
         }
 
         public String binary() {
-            if (osName.startsWith("windows")) {
-                return "kiota.exe";
-            } else {
-                return "kiota";
-            }
+            return os.getBinary();
         }
     }
 }
