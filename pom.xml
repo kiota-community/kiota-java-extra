@@ -64,7 +64,7 @@
     <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
     <nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <quarkus.version>3.21.3</quarkus.version>
+    <quarkus.version>3.22.0</quarkus.version>
     <kiota.libs.version>1.8.4</kiota.libs.version>
     <spotless.version>2.44.4</spotless.version>
   </properties>
