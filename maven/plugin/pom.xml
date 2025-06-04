@@ -5,13 +5,13 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-maven-plugin-parent</artifactId>
-    <version>0.0.22</version>
+    <version>999-SNAPSHOT</version>
   </parent>
 
   <artifactId>kiota-maven-plugin</artifactId>
-  <name>Kiota - Maven Plugin</name>
-  <version>0.0.22</version>
+  <version>999-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
+  <name>Kiota - Maven Plugin</name>
 
   <description>A Maven plugin to generate code with Kiota</description>
 

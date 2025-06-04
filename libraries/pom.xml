@@ -5,14 +5,14 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-java-extra-parent</artifactId>
-    <version>0.0.22</version>
+    <version>999-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>kiota-libraries-parent</artifactId>
-  <name>kiota-libraries-parent</name>
-  <version>0.0.22</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
+  <name>kiota-libraries-parent</name>
 
   <description>Alternative support libraries for Kiota</description>
 
