@@ -9,6 +9,7 @@
   </parent>
 
   <artifactId>kiota-maven-plugin</artifactId>
+  <name>Kiota - Maven Plugin</name>
   <version>999-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 

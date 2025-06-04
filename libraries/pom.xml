@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>kiota-libraries-parent</artifactId>
+  <name>kiota-libraries-parent</name>
   <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
 
