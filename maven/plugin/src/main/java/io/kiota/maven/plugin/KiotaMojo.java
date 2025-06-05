@@ -446,7 +446,7 @@ public class KiotaMojo extends AbstractMojo {
             if ("aarch64".equals(rawArchString)) {
                 return ARM64;
             }
-            if (rawArchString.matches("^(x8664|amd64|ia32e|em64t|x64)$")) {
+            if (rawArchString.matches("^(x8664|x86_64|amd64|ia32e|em64t|x64)$")) {
                 return X64;
             }
             if (rawArchString.matches("^(x8632|x86|i[3-6]86|ia32|x32)$")) {
