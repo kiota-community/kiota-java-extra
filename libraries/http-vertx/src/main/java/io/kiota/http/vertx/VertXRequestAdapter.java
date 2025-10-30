@@ -32,9 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -409,13 +407,8 @@ public class VertXRequestAdapter implements RequestAdapter {
         this.setBaseUrlForRequestInformation(requestInfo);
         Future<HttpResponse<Buffer>> result;
         try {
-            var req =
-                    this.client
-                            .requestAbs(
-                                    HttpMethodCompatibility.convert(requestInfo.httpMethod),
-                                    requestInfo.getUri().toString())
-                            .putHeaders(HeadersCompatibility.getMultiMap(requestInfo.headers))
-                            .followRedirects(true);
+            HttpRequest<Buffer> req = convertToNativeRequest(requestInfo);
+
             if (requestInfo.content == null) {
                 result = req.send();
             } else {
@@ -429,8 +422,6 @@ public class VertXRequestAdapter implements RequestAdapter {
 
             // TODO: move this to await in VirtualThreads, should be easy!
             return result.toCompletionStage().toCompletableFuture().get();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (ExecutionException e) {
@@ -445,28 +436,24 @@ public class VertXRequestAdapter implements RequestAdapter {
         requestInfo.pathParameters.put("baseurl", getBaseUrl());
     }
 
+    @SuppressWarnings("unchecked")
     @Nonnull
-    public <T> T convertToNativeRequest(@Nonnull final RequestInformation requestInfo) {
+    public HttpRequest<Buffer> convertToNativeRequest(
+            @Nonnull final RequestInformation requestInfo) {
         try {
             Objects.requireNonNull(requestInfo, nullRequestInfoParameter);
-            return (T) getRequestFromRequestInformation(requestInfo);
-        } catch (URISyntaxException | MalformedURLException ex) {
+            return getRequestFromRequestInformation(requestInfo);
+        } catch (URISyntaxException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    protected @Nonnull HttpRequest getRequestFromRequestInformation(
-            @Nonnull final RequestInformation requestInfo)
-            throws URISyntaxException, MalformedURLException {
-        final URL requestURL = requestInfo.getUri().toURL();
-
-        final HttpRequest request =
-                client.requestAbs(
-                                HttpMethodCompatibility.convert(requestInfo.httpMethod),
-                                requestURL.toString())
-                        .followRedirects(true);
-
-        request.putHeaders(HeadersCompatibility.getMultiMap(requestInfo.headers));
-        return request;
+    protected @Nonnull HttpRequest<Buffer> getRequestFromRequestInformation(
+            @Nonnull final RequestInformation requestInfo) throws URISyntaxException {
+        return client.requestAbs(
+                        HttpMethodCompatibility.convert(requestInfo.httpMethod),
+                        requestInfo.getUri().toString())
+                .putHeaders(HeadersCompatibility.getMultiMap(requestInfo.headers))
+                .followRedirects(true);
     }
 }

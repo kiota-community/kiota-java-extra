@@ -398,8 +398,7 @@ public class JDKRequestAdapter implements RequestAdapter {
         this.setBaseUrlForRequestInformation(requestInfo);
         try {
             return this.client.send(
-                    HttpRequestCompatibility.convert(requestInfo),
-                    HttpResponse.BodyHandlers.ofInputStream());
+                    convertToNativeRequest(requestInfo), HttpResponse.BodyHandlers.ofInputStream());
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
@@ -412,10 +411,11 @@ public class JDKRequestAdapter implements RequestAdapter {
         requestInfo.pathParameters.put("baseurl", getBaseUrl());
     }
 
+    @SuppressWarnings("unchecked")
     @Nonnull
-    public <T> T convertToNativeRequest(@Nonnull final RequestInformation requestInfo) {
+    public HttpRequest convertToNativeRequest(@Nonnull final RequestInformation requestInfo) {
         Objects.requireNonNull(requestInfo, nullRequestInfoParameter);
-        return (T) getRequestFromRequestInformation(requestInfo);
+        return getRequestFromRequestInformation(requestInfo);
     }
 
     protected @Nonnull HttpRequest getRequestFromRequestInformation(
