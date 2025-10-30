@@ -29,7 +29,8 @@ public class PrimitiveTests {
     @Test
     public void deserializePrimitiveTypes() throws IOException {
         // Arrange
-        JsonParseNode node = new JsonParseNode(mapper.readTree("123"));
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("123"));
 
         // Act
         var intValue = node.getIntegerValue();

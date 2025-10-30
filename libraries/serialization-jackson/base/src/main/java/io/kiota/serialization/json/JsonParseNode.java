@@ -25,13 +25,16 @@ import java.util.function.Consumer;
 
 /** ParseNode implementation for JSON */
 public class JsonParseNode implements ParseNode {
-    private final JsonNode currentNode;
+    private final JsonParseNodeFactory factory;
+    protected final JsonNode currentNode;
 
     /**
      * Creates a new instance of the JsonParseNode class.
      * @param node the node to wrap.
      */
-    public JsonParseNode(@Nonnull final JsonNode node) {
+    public JsonParseNode(
+            @Nonnull final JsonParseNodeFactory nodeFactory, @Nonnull final JsonNode node) {
+        factory = Objects.requireNonNull(nodeFactory, "parameter nodeFactory cannot be null");
         currentNode = Objects.requireNonNull(node, "parameter node cannot be null");
     }
 
@@ -42,12 +45,10 @@ public class JsonParseNode implements ParseNode {
         if (currentNode.isObject()) {
             final Consumer<Parsable> onBefore = this.onBeforeAssignFieldValues;
             final Consumer<Parsable> onAfter = this.onAfterAssignFieldValues;
-            return new JsonParseNode(currentNode.get(identifier)) {
-                {
-                    this.setOnBeforeAssignFieldValues(onBefore);
-                    this.setOnAfterAssignFieldValues(onAfter);
-                }
-            };
+            final JsonParseNode node = factory.createJsonParseNode(currentNode.get(identifier));
+            node.setOnBeforeAssignFieldValues(onBefore);
+            node.setOnAfterAssignFieldValues(onAfter);
+            return node;
         } else return null;
     }
 
@@ -192,7 +193,7 @@ public class JsonParseNode implements ParseNode {
             List<T> result = new ArrayList<>();
             while (iter.hasNext()) {
                 JsonNode item = iter.next();
-                final JsonParseNode itemNode = new JsonParseNode(item);
+                final JsonParseNode itemNode = factory.createJsonParseNode(item);
                 itemNode.setOnBeforeAssignFieldValues(this.getOnBeforeAssignFieldValues());
                 itemNode.setOnAfterAssignFieldValues(this.getOnAfterAssignFieldValues());
                 result.add(getPrimitiveElement(targetClass, itemNode));
@@ -212,7 +213,7 @@ public class JsonParseNode implements ParseNode {
             List<T> result = new ArrayList<>();
             while (iter.hasNext()) {
                 JsonNode item = iter.next();
-                final JsonParseNode itemNode = new JsonParseNode(item);
+                final JsonParseNode itemNode = this.factory.createJsonParseNode(item);
                 itemNode.setOnBeforeAssignFieldValues(this.getOnBeforeAssignFieldValues());
                 itemNode.setOnAfterAssignFieldValues(this.getOnAfterAssignFieldValues());
                 result.add(itemNode.getObjectValue(factory));
@@ -232,7 +233,7 @@ public class JsonParseNode implements ParseNode {
             List<T> result = new ArrayList<>();
             while (iter.hasNext()) {
                 JsonNode item = iter.next();
-                final JsonParseNode itemNode = new JsonParseNode(item);
+                final JsonParseNode itemNode = factory.createJsonParseNode(item);
                 itemNode.setOnBeforeAssignFieldValues(this.getOnBeforeAssignFieldValues());
                 itemNode.setOnAfterAssignFieldValues(this.getOnAfterAssignFieldValues());
                 result.add(itemNode.getEnumValue(enumParser));
@@ -294,7 +295,7 @@ public class JsonParseNode implements ParseNode {
                 final JsonNode fieldValue = fieldEntry.getValue();
                 if (fieldValue.isNull()) continue;
                 if (fieldDeserializer != null) {
-                    JsonParseNode itemNode = new JsonParseNode(fieldValue);
+                    JsonParseNode itemNode = factory.createJsonParseNode(fieldValue);
                     itemNode.setOnBeforeAssignFieldValues(this.onBeforeAssignFieldValues);
                     itemNode.setOnAfterAssignFieldValues(this.onAfterAssignFieldValues);
                     fieldDeserializer.accept(itemNode);
