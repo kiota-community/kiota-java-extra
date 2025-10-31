@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-libraries-parent</artifactId>
-    <version>0.0.30</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>kiota-http-vertx</artifactId>
   <name>Kiota - Http - Vert.X</name>

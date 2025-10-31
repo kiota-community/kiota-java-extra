@@ -5,11 +5,11 @@
   <parent>
     <groupId>io.kiota</groupId>
     <artifactId>kiota-java-extra-parent</artifactId>
-    <version>0.0.30</version>
+    <version>999-SNAPSHOT</version>
   </parent>
 
   <artifactId>kiota-maven-plugin-parent</artifactId>
-  <version>0.0.30</version>
+  <version>999-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>kiota-maven-plugin-parent</name>
 
