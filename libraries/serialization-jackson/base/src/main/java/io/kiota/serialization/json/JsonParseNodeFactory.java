@@ -1,5 +1,6 @@
 package io.kiota.serialization.json;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectReader;
 import com.microsoft.kiota.serialization.ParseNode;
 import com.microsoft.kiota.serialization.ParseNodeFactory;
@@ -27,6 +28,10 @@ public class JsonParseNodeFactory implements ParseNodeFactory {
         return JsonMapper.mapper.reader();
     }
 
+    protected JsonParseNode createJsonParseNode(JsonNode currentNode) {
+        return new JsonParseNode(this, currentNode);
+    }
+
     /** {@inheritDoc} */
     @Override
     @Nonnull
@@ -41,7 +46,7 @@ public class JsonParseNodeFactory implements ParseNodeFactory {
         }
         try (final InputStreamReader reader =
                 new InputStreamReader(rawResponse, StandardCharsets.UTF_8)) {
-            return new JsonParseNode(getObjectReader().readTree(reader));
+            return createJsonParseNode(getObjectReader().readTree(reader));
         } catch (IOException ex) {
             throw new RuntimeException("could not close the reader", ex);
         }

@@ -133,8 +133,9 @@ public class ObjectTypeTests {
     @Test
     public void deserializeObjectType() throws IOException {
         // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                new JsonParseNode(
+                factory.createJsonParseNode(
                         mapper.readTree(
                                 "{\"string\":\"I am a"
                                     + " string\",\"integer\":1,\"lo\":2,\"bool\":true,\"flo\":0.1,\"doub\":0.2}"));
@@ -150,8 +151,9 @@ public class ObjectTypeTests {
     @Test
     public void deserializeObjectTypeWithUnknownInt() throws IOException {
         // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                new JsonParseNode(
+                factory.createJsonParseNode(
                         mapper.readTree(
                                 "{\"string\":\"I am a string\",\"integer\":1,\"unknownint\":2}"));
         var objValue = node.getObjectValue(TestObject::createFromDiscriminatorValue);
@@ -161,8 +163,9 @@ public class ObjectTypeTests {
     @Test
     public void deserializeObjectTypeWithUnknownString() throws IOException {
         // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                new JsonParseNode(
+                factory.createJsonParseNode(
                         mapper.readTree(
                                 "{\"string\":\"I am a"
                                         + " string\",\"integer\":1,\"unknownstr\":\"unknown\"}"));
@@ -173,8 +176,9 @@ public class ObjectTypeTests {
     @Test
     public void deserializeObjectTypeWithUnknownFloat() throws IOException {
         // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                new JsonParseNode(
+                factory.createJsonParseNode(
                         mapper.readTree(
                                 "{\"string\":\"I am a"
                                         + " string\",\"integer\":1,\"unknownfloat\":0.1}"));
@@ -185,8 +189,9 @@ public class ObjectTypeTests {
     @Test
     public void deserializeObjectTypeWithUnknownBoolean() throws IOException {
         // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                new JsonParseNode(
+                factory.createJsonParseNode(
                         mapper.readTree(
                                 "{\"string\":\"I am a"
                                         + " string\",\"integer\":1,\"unknownbool\":true}"));
