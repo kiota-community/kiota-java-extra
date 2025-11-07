@@ -151,25 +151,75 @@ public class KiotaMojo extends AbstractMojo {
     private String clientClass;
 
     /**
-     * The namespace to use for the core client class specified with the --class-name option. [default: ApiSdk]
+     * The namespace to use for the core client class specified with the --class-name option.
+     * [default: ApiSdk]
      *
      */
     @Parameter(defaultValue = "com.apisdk")
     private String namespace;
 
     /**
-     * Clean output before generating
-     *
+     * The type access modifier to use for the client types, specified with --type-access-modifier.
+     * [default: Public]
      */
-    @Parameter(defaultValue = "false")
-    private String cleanOutput;
+    @Parameter(defaultValue = "Public")
+    private KiotaAccessModifier typeAccessModifier;
 
     /**
-     * Clear cache before generating
+     * Enables backing store for models, specified with --backing-store. [default: False]
+     */
+    @Parameter(defaultValue = "false")
+    private boolean backingStore;
+
+    /**
+     * Excludes backward compatible and obsolete assets from the generated result. Should be used
+     * for new clients. Specified with --exclude-backward-compatible. [default: False]
+     */
+    @Parameter(defaultValue = "false")
+    private boolean excludeBackwardCompatible;
+
+    /**
+     * Will include the 'AdditionalData' property for models. Specified with --additional-data.
+     * [default: True]
+     */
+    @Parameter(defaultValue = "true")
+    private boolean additionalData;
+
+    /**
+     * The MIME types with optional priorities as defined in RFC9110 Accept header
+     * to use for structured data model generation. Accepts multiple values.
+     * Specified with --structured-mime-types. [default:
+     * application/json|text/plain;q=0.9|application/x-www-form-urlencoded;q=0.2|
+     * multipart/form-data;q=0.1]
+     */
+    @Parameter() private List<String> structuredMimeTypes;
+
+    /**
+     * The OpenAPI description validation rules to disable. Accepts multiple values.
+     * Specified with --disable-validation-rules. [default: none]
+     */
+    @Parameter() private List<KiotaValidationRule> disableValidationRules;
+
+    /**
+     * Disables SSL certificate validation. Specified with --disable-ssl-validation.
+     * [default: False]
+     */
+    @Parameter(defaultValue = "false")
+    private boolean disableSslValidation;
+
+    /**
+     * Removes all files from the output directory before generating the code files. [default: False]
      *
      */
     @Parameter(defaultValue = "false")
-    private String clearCache;
+    private boolean cleanOutput;
+
+    /**
+     * Clears any cached data for the current command. [default: False]
+     *
+     */
+    @Parameter(defaultValue = "false")
+    private boolean clearCache;
 
     /**
      * Kiota timeout in seconds
@@ -183,7 +233,12 @@ public class KiotaMojo extends AbstractMojo {
      * <Critical|Debug|Error|Information|None|Trace|Warning>
      */
     @Parameter(defaultValue = "Warning")
-    private String kiotaLogLevel;
+    private KiotaLogLevel kiotaLogLevel;
+
+    /**
+     * Any additional arguments that need to be passed to Kiota. [default: none]
+     */
+    @Parameter() private List<String> extraArguments;
 
     /**
      * The current Maven project.
@@ -332,6 +387,8 @@ public class KiotaMojo extends AbstractMojo {
         cmd.add(clientClass);
         cmd.add("--namespace-name");
         cmd.add(namespace);
+        cmd.add("--type-access-modifier");
+        cmd.add(typeAccessModifier.name());
         for (String serializer : serializers) {
             cmd.add("--serializer");
             cmd.add(serializer);
@@ -352,12 +409,41 @@ public class KiotaMojo extends AbstractMojo {
                 cmd.add(e);
             }
         }
-        cmd.add("--clean-output");
-        cmd.add(cleanOutput);
-        cmd.add("--clear-cache");
-        cmd.add(clearCache);
+        if (backingStore) {
+            cmd.add("--backing-store");
+        }
+        if (excludeBackwardCompatible) {
+            cmd.add("--exclude-backward-compatible");
+        }
+        if (additionalData) {
+            cmd.add("--additional-data");
+        }
+        if (structuredMimeTypes != null) {
+            for (String s : structuredMimeTypes) {
+                cmd.add("--structured-mime-types");
+                cmd.add(s);
+            }
+        }
+        if (disableValidationRules != null) {
+            for (KiotaValidationRule r : disableValidationRules) {
+                cmd.add("--disable-validation-rules");
+                cmd.add(r.name());
+            }
+        }
+        if (disableSslValidation) {
+            cmd.add("--disable-ssl-validation");
+        }
+        if (cleanOutput) {
+            cmd.add("--clean-output");
+        }
+        if (clearCache) {
+            cmd.add("--clear-cache");
+        }
         cmd.add("--log-level");
-        cmd.add(kiotaLogLevel);
+        cmd.add(kiotaLogLevel.name());
+        if (extraArguments != null) {
+            cmd.addAll(extraArguments);
+        }
 
         runProcess(cmd, false);
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
