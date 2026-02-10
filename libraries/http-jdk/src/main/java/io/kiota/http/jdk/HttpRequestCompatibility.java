@@ -1,5 +1,6 @@
 package io.kiota.http.jdk;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
 import java.util.Map;
@@ -9,10 +10,21 @@ public class HttpRequestCompatibility {
     private HttpRequestCompatibility() {}
 
     public static HttpRequest convert(com.microsoft.kiota.RequestInformation requestInfo) {
-        final HttpRequest.BodyPublisher body =
-                requestInfo.content == null
-                        ? HttpRequest.BodyPublishers.noBody()
-                        : HttpRequest.BodyPublishers.ofInputStream(() -> requestInfo.content);
+        final HttpRequest.BodyPublisher body;
+        if (requestInfo.content == null) {
+            body = HttpRequest.BodyPublishers.noBody();
+        } else {
+            try {
+                final byte[] contentBytes = requestInfo.content.readAllBytes();
+                if (contentBytes.length == 0) {
+                    body = HttpRequest.BodyPublishers.noBody();
+                } else {
+                    body = HttpRequest.BodyPublishers.ofByteArray(contentBytes);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         final HttpRequest.Builder requestBuilder;
         try {
             requestBuilder =
