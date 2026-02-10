@@ -16,15 +16,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-/**
- * Reproducer for https://github.com/kiota-community/kiota-java-extra/issues/206
- *
- * <p>The original report showed that a POST operation using {@link JDKRequestAdapter} would hang or
- * time out, while a preceding GET call succeeded. This test exercises a minimal POST request
- * against an in-process HTTP server to ensure the adapter can successfully complete a POST
- * request.
- */
 public class JDKRequestAdapterPostReproducerTest {
 
     private static HttpServer server;
@@ -33,7 +24,6 @@ public class JDKRequestAdapterPostReproducerTest {
     @BeforeAll
     public static void startServer() throws IOException {
         server = HttpServer.create(new InetSocketAddress(0), 0);
-        // Minimal GET endpoint similar to the Apicurio system.info call
         server.createContext(
                 "/system/info",
                 new HttpHandler() {
@@ -63,9 +53,8 @@ public class JDKRequestAdapterPostReproducerTest {
                     public void handle(HttpExchange exchange) throws IOException {
                         try {
                             if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                                // Read the full request body so the client can complete the POST.
                                 exchange.getRequestBody().readAllBytes();
-                                exchange.sendResponseHeaders(204, -1); // No content
+                                exchange.sendResponseHeaders(204, -1);
                             } else {
                                 exchange.sendResponseHeaders(405, -1);
                             }
@@ -92,7 +81,6 @@ public class JDKRequestAdapterPostReproducerTest {
         JDKRequestAdapter adapter = new JDKRequestAdapter();
         adapter.setBaseUrl(baseUrl);
 
-        // First perform a GET call (like client.system().info().get())
         RequestInformation getInfo = new RequestInformation();
         getInfo.setUri(URI.create(baseUrl + "/system/info"));
         getInfo.httpMethod = HttpMethod.GET;
@@ -107,8 +95,6 @@ public class JDKRequestAdapterPostReproducerTest {
         requestInfo.headers.add("Content-Type", "application/json");
         requestInfo.headers.add("Accept", "application/json");
 
-        // Use a timeout so that the current (buggy) behavior is expressed as a failing test
-        // instead of an infinite hang.
         Assertions.assertTimeoutPreemptively(
                 Duration.ofSeconds(10), () -> adapter.sendPrimitive(requestInfo, null, Void.class));
     }

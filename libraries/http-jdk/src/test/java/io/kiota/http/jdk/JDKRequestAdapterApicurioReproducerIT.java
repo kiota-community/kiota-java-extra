@@ -11,23 +11,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-
-/**
- * Integration test using Apicurio Registry in Testcontainers to reproduce
- * https://github.com/kiota-community/kiota-java-extra/issues/206.
- *
- * <p>This follows the exact sequence reported in the issue:
- *
- * <pre>
- * RequestAdapter adapter = new JDKRequestAdapter();
- * adapter.setBaseUrl("http://localhost:8080/apis/registry/v3");
- * var client = new RegistryClient(adapter);
- * SystemInfo systemInfo = client.system().info().get();
- * CreateGroup createGroup = new CreateGroup();
- * createGroup.setGroupId("test-group");
- * client.groups().post(createGroup);
- * </pre>
- */
 @Testcontainers
 public class JDKRequestAdapterApicurioReproducerIT {
 
@@ -50,19 +33,14 @@ public class JDKRequestAdapterApicurioReproducerIT {
 
         RegistryClient client = new RegistryClient(adapter);
 
-        // First call: GET /system/info
         SystemInfo systemInfo =
                 Assertions.assertTimeoutPreemptively(
                         Duration.ofSeconds(30), () -> client.system().info().get());
         Assertions.assertNotNull(systemInfo);
 
-        // Second call: POST /groups with JSON body
         CreateGroupMetaData createGroup = new CreateGroupMetaData();
         createGroup.setId("test-group");
 
-        // The original bug report indicates that this POST may hang or time out.
-        // We express that as a timeout expectation so the current buggy behavior
-        // shows up as a failing test instead of an infinite hang.
         Assertions.assertTimeoutPreemptively(
                 Duration.ofSeconds(30), () -> client.groups().post(createGroup));
     }
