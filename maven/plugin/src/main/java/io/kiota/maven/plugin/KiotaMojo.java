@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -229,6 +231,19 @@ public class KiotaMojo extends AbstractMojo {
     private int kiotaTimeout;
 
     /**
+     * Maximum number of retry attempts for downloading the Kiota binary.
+     */
+    @Parameter(defaultValue = "3", property = "kiota.download.maxRetries")
+    private int downloadMaxRetries;
+
+    /**
+     * Initial delay in milliseconds between download retry attempts.
+     * The delay doubles with each subsequent retry (exponential backoff).
+     */
+    @Parameter(defaultValue = "1000", property = "kiota.download.retryDelayMs")
+    private long downloadRetryDelayMs;
+
+    /**
      * The log level of Kiota to use when logging messages to the main output. [default: Warning]
      * <Critical|Debug|Error|Information|None|Trace|Warning>
      */
@@ -450,19 +465,20 @@ public class KiotaMojo extends AbstractMojo {
     }
 
     private void downloadAndExtract(String url, String dest, KiotaParams kp) {
-        try {
-            URL s = new URL(url);
-            File zipFile = Paths.get(dest, "kiota.zip").toFile();
-            File finalDestination = Paths.get(dest, kp.binary()).toFile();
+        File zipFile = Paths.get(dest, "kiota.zip").toFile();
+        File finalDestination = Paths.get(dest, kp.binary()).toFile();
 
-            if (!finalDestination.exists()) {
-                new File(dest).mkdirs();
-                ReadableByteChannel readableByteChannel = Channels.newChannel(s.openStream());
-                try (FileOutputStream fileOutputStream = new FileOutputStream(zipFile)) {
-                    fileOutputStream
-                            .getChannel()
-                            .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-                }
+        if (finalDestination.exists()) {
+            return;
+        }
+
+        new File(dest).mkdirs();
+
+        IOException lastException = null;
+        int maxAttempts = downloadMaxRetries + 1;
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            try {
+                downloadFile(url, zipFile);
                 try (FileSystem fileSystem =
                         FileSystems.newFileSystem(
                                 zipFile.toPath(), this.getClass().getClassLoader())) {
@@ -471,9 +487,62 @@ public class KiotaMojo extends AbstractMojo {
                 }
                 finalDestination.setExecutable(true, false);
                 zipFile.delete();
+                return;
+            } catch (IOException e) {
+                lastException = e;
+                // Clean up partial downloads
+                zipFile.delete();
+                finalDestination.delete();
+
+                if (attempt < maxAttempts) {
+                    long delay = Math.min(downloadRetryDelayMs * (1L << (attempt - 1)), 256_000L);
+                    log.warn(
+                            "Download attempt "
+                                    + attempt
+                                    + " of "
+                                    + maxAttempts
+                                    + " failed: "
+                                    + e.getMessage()
+                                    + ". Retrying in "
+                                    + delay
+                                    + "ms ...");
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                        throw new IllegalStateException(
+                                "Download interrupted while retrying: " + url, e);
+                    }
+                }
             }
-        } catch (IOException e) {
-            throw new IllegalStateException("Error downloading the Kiota release: " + url, e);
+        }
+        throw new IllegalStateException(
+                "Error downloading the Kiota release after " + maxAttempts + " attempt(s): " + url,
+                lastException);
+    }
+
+    private void downloadFile(String url, File destination) throws IOException {
+        URL s = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) s.openConnection();
+        connection.setInstanceFollowRedirects(true);
+        try {
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new IOException(
+                        "HTTP "
+                                + responseCode
+                                + " "
+                                + connection.getResponseMessage()
+                                + " when downloading "
+                                + url);
+            }
+            try (InputStream inputStream = connection.getInputStream();
+                    ReadableByteChannel readableByteChannel = Channels.newChannel(inputStream);
+                    FileOutputStream fileOutputStream = new FileOutputStream(destination)) {
+                fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+            }
+        } finally {
+            connection.disconnect();
         }
     }
 
