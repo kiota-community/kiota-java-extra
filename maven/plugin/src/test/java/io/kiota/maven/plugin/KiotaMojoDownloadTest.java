@@ -195,6 +195,45 @@ class KiotaMojoDownloadTest {
         assertFalse(new File(dest, "kiota").exists(), "Partial binary should be cleaned up");
     }
 
+    @Test
+    void downloadFile_sendsAuthorizationHeaderWhenTokenConfigured() throws Exception {
+        setField(mojo, "downloadToken", "test-token-123");
+
+        byte[] content = "test content".getBytes();
+        server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
+
+        File dest = tempDir.resolve("download.zip").toFile();
+        invokeDownloadFile(server.url("/test.zip").toString(), dest);
+
+        assertEquals("Bearer test-token-123", server.takeRequest().getHeader("Authorization"));
+    }
+
+    @Test
+    void downloadFile_configuredTokenTakesPrecedenceOverEnvVar() throws Exception {
+        setField(mojo, "downloadToken", "configured-token");
+
+        byte[] content = "test content".getBytes();
+        server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
+
+        File dest = tempDir.resolve("download.zip").toFile();
+        invokeDownloadFile(server.url("/test.zip").toString(), dest);
+
+        assertEquals("Bearer configured-token", server.takeRequest().getHeader("Authorization"));
+    }
+
+    @Test
+    void downloadFile_noAuthorizationHeaderWhenEnvTokenDisabled() throws Exception {
+        setField(mojo, "downloadUseTokenFromEnv", false);
+
+        byte[] content = "test content".getBytes();
+        server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
+
+        File dest = tempDir.resolve("download.zip").toFile();
+        invokeDownloadFile(server.url("/test.zip").toString(), dest);
+
+        assertNull(server.takeRequest().getHeader("Authorization"));
+    }
+
     private byte[] createKiotaZip(String binaryName) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (ZipOutputStream zos = new ZipOutputStream(baos)) {

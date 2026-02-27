@@ -244,6 +244,22 @@ public class KiotaMojo extends AbstractMojo {
     private long downloadRetryDelayMs;
 
     /**
+     * GitHub token for authenticating download requests. Useful for private repositories
+     * or to avoid rate limiting. If not set and {@code downloadUseTokenFromEnv} is true,
+     * the plugin checks the GITHUB_TOKEN, GH_TOKEN, and KIOTA_TOKEN environment variables
+     * in that order.
+     */
+    @Parameter(property = "kiota.download.token")
+    private String downloadToken;
+
+    /**
+     * Whether to look for a download token in the GITHUB_TOKEN, GH_TOKEN, and KIOTA_TOKEN
+     * environment variables when no explicit token is configured.
+     */
+    @Parameter(defaultValue = "true", property = "kiota.download.useTokenFromEnv")
+    private boolean downloadUseTokenFromEnv;
+
+    /**
      * The log level of Kiota to use when logging messages to the main output. [default: Warning]
      * <Critical|Debug|Error|Information|None|Trace|Warning>
      */
@@ -521,10 +537,30 @@ public class KiotaMojo extends AbstractMojo {
                 lastException);
     }
 
+    private String resolveDownloadToken() {
+        if (downloadToken != null && !downloadToken.isEmpty()) {
+            return downloadToken;
+        }
+        if (!downloadUseTokenFromEnv) {
+            return null;
+        }
+        for (String envVar : new String[] {"GITHUB_TOKEN", "GH_TOKEN", "KIOTA_TOKEN"}) {
+            String token = System.getenv(envVar);
+            if (token != null && !token.isEmpty()) {
+                return token;
+            }
+        }
+        return null;
+    }
+
     private void downloadFile(String url, File destination) throws IOException {
         URL s = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) s.openConnection();
         connection.setInstanceFollowRedirects(true);
+        String token = resolveDownloadToken();
+        if (token != null && !token.isEmpty()) {
+            connection.setRequestProperty("Authorization", "Bearer " + token);
+        }
         try {
             int responseCode = connection.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK) {
