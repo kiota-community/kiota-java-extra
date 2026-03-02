@@ -1,4 +1,5 @@
-target
+.claude
 .idea
-.vscode
 .project
+.vscode
+target
