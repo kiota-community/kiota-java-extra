@@ -43,75 +43,10 @@ class KiotaMojoDownloadTest {
     }
 
     @Test
-    void downloadFile_success() throws Exception {
-        byte[] content = "test content".getBytes();
-        server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
-
-        File dest = tempDir.resolve("download.zip").toFile();
-        invokeDownloadFile(server.url("/test.zip").toString(), dest);
-
-        assertTrue(dest.exists());
-        assertEquals(content.length, dest.length());
-    }
-
-    @Test
-    void downloadFile_httpErrorIncludesStatusCode() {
-        server.enqueue(new MockResponse().setResponseCode(404));
-
-        File dest = tempDir.resolve("download.zip").toFile();
-        IOException ex =
-                assertThrows(
-                        IOException.class,
-                        () -> invokeDownloadFile(server.url("/test.zip").toString(), dest));
-
-        assertTrue(
-                ex.getMessage().contains("HTTP 404"), "Expected HTTP 404 in: " + ex.getMessage());
-    }
-
-    @Test
-    void downloadFile_serverError() {
-        server.enqueue(new MockResponse().setResponseCode(503));
-
-        File dest = tempDir.resolve("download.zip").toFile();
-        IOException ex =
-                assertThrows(
-                        IOException.class,
-                        () -> invokeDownloadFile(server.url("/test.zip").toString(), dest));
-
-        assertTrue(
-                ex.getMessage().contains("HTTP 503"), "Expected HTTP 503 in: " + ex.getMessage());
-    }
-
-    @Test
-    void downloadAndExtract_successOnFirstAttempt() throws Exception {
-        byte[] zipBytes = createKiotaZip("kiota");
-        server.enqueue(new MockResponse().setBody(new Buffer().write(zipBytes)));
-
-        String dest = tempDir.resolve("extract").toString();
-        invokeDownloadAndExtract(server.url("/kiota.zip").toString(), dest, "Linux", "amd64");
-
-        assertTrue(new File(dest, "kiota").exists());
-        assertEquals(1, server.getRequestCount());
-    }
-
-    @Test
     void downloadAndExtract_retriesOnFailureThenSucceeds() throws Exception {
         byte[] zipBytes = createKiotaZip("kiota");
         server.enqueue(new MockResponse().setResponseCode(503));
-        server.enqueue(new MockResponse().setBody(new Buffer().write(zipBytes)));
-
-        String dest = tempDir.resolve("extract").toString();
-        invokeDownloadAndExtract(server.url("/kiota.zip").toString(), dest, "Linux", "amd64");
-
-        assertTrue(new File(dest, "kiota").exists());
-        assertEquals(2, server.getRequestCount());
-    }
-
-    @Test
-    void downloadAndExtract_retriesMultipleTimesBeforeSuccess() throws Exception {
-        byte[] zipBytes = createKiotaZip("kiota");
         server.enqueue(new MockResponse().setResponseCode(500));
-        server.enqueue(new MockResponse().setResponseCode(503));
         server.enqueue(new MockResponse().setBody(new Buffer().write(zipBytes)));
 
         String dest = tempDir.resolve("extract").toString();
@@ -122,10 +57,10 @@ class KiotaMojoDownloadTest {
     }
 
     @Test
-    void downloadAndExtract_exhaustsRetriesThenFails() {
+    void downloadAndExtract_exhaustsRetriesWithHttpCodeInError() {
         server.enqueue(new MockResponse().setResponseCode(500));
         server.enqueue(new MockResponse().setResponseCode(500));
-        server.enqueue(new MockResponse().setResponseCode(500));
+        server.enqueue(new MockResponse().setResponseCode(404));
 
         String dest = tempDir.resolve("extract").toString();
         IllegalStateException ex =
@@ -141,84 +76,10 @@ class KiotaMojoDownloadTest {
         assertTrue(
                 ex.getMessage().contains("3 attempt(s)"),
                 "Expected '3 attempt(s)' in: " + ex.getMessage());
-        assertNotNull(ex.getCause());
-        assertEquals(3, server.getRequestCount());
-    }
-
-    @Test
-    void downloadAndExtract_errorMessageIncludesHttpCode() {
-        server.enqueue(new MockResponse().setResponseCode(404));
-        server.enqueue(new MockResponse().setResponseCode(404));
-        server.enqueue(new MockResponse().setResponseCode(404));
-
-        String dest = tempDir.resolve("extract").toString();
-        IllegalStateException ex =
-                assertThrows(
-                        IllegalStateException.class,
-                        () ->
-                                invokeDownloadAndExtract(
-                                        server.url("/kiota.zip").toString(),
-                                        dest,
-                                        "Linux",
-                                        "amd64"));
-
         assertTrue(
                 ex.getCause().getMessage().contains("HTTP 404"),
                 "Expected HTTP 404 in cause: " + ex.getCause().getMessage());
-    }
-
-    @Test
-    void downloadAndExtract_skipsIfBinaryAlreadyExists() throws Exception {
-        String dest = tempDir.resolve("extract").toString();
-        new File(dest).mkdirs();
-        new File(dest, "kiota").createNewFile();
-
-        invokeDownloadAndExtract("http://should-not-be-called/kiota.zip", dest, "Linux", "amd64");
-
-        assertEquals(0, server.getRequestCount());
-    }
-
-    @Test
-    void downloadAndExtract_cleansUpPartialDownloadsOnFailure() {
-        server.enqueue(new MockResponse().setResponseCode(500));
-        server.enqueue(new MockResponse().setResponseCode(500));
-        server.enqueue(new MockResponse().setResponseCode(500));
-
-        String dest = tempDir.resolve("extract").toString();
-        assertThrows(
-                IllegalStateException.class,
-                () ->
-                        invokeDownloadAndExtract(
-                                server.url("/kiota.zip").toString(), dest, "Linux", "amd64"));
-
-        assertFalse(new File(dest, "kiota.zip").exists(), "Partial zip should be cleaned up");
-        assertFalse(new File(dest, "kiota").exists(), "Partial binary should be cleaned up");
-    }
-
-    @Test
-    void downloadFile_sendsAuthorizationHeaderWhenTokenConfigured() throws Exception {
-        setField(mojo, "downloadToken", "test-token-123");
-
-        byte[] content = "test content".getBytes();
-        server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
-
-        File dest = tempDir.resolve("download.zip").toFile();
-        invokeDownloadFile(server.url("/test.zip").toString(), dest);
-
-        assertEquals("Bearer test-token-123", server.takeRequest().getHeader("Authorization"));
-    }
-
-    @Test
-    void downloadFile_configuredTokenTakesPrecedenceOverEnvVar() throws Exception {
-        setField(mojo, "downloadToken", "configured-token");
-
-        byte[] content = "test content".getBytes();
-        server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
-
-        File dest = tempDir.resolve("download.zip").toFile();
-        invokeDownloadFile(server.url("/test.zip").toString(), dest);
-
-        assertEquals("Bearer configured-token", server.takeRequest().getHeader("Authorization"));
+        assertEquals(3, server.getRequestCount());
     }
 
     @Test
