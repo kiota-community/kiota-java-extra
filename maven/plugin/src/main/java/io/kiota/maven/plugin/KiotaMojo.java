@@ -485,6 +485,8 @@ public class KiotaMojo extends AbstractMojo {
         File finalDestination = Paths.get(dest, kp.binary()).toFile();
 
         if (finalDestination.exists()) {
+            log.info("Kiota binary already exists: " + finalDestination);
+            finalDestination.setExecutable(true, false);
             return;
         }
 
