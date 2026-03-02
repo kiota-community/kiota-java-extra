@@ -105,6 +105,29 @@ Available parameters:
     useSystemKiota (Default: false)
       User property: kiota.system
       Use system provided kiota executable (needs to be available on the PATH)
+
+    downloadMaxRetries (Default: 3)
+      User property: kiota.download.maxRetries
+      Maximum number of retry attempts for downloading the Kiota binary.
+
+    downloadRetryDelayMs (Default: 1000)
+      User property: kiota.download.retryDelayMs
+      Initial delay in milliseconds between download retry attempts.
+      The delay doubles with each subsequent retry (exponential backoff),
+      up to a maximum of 256 seconds.
+
+    downloadToken
+      User property: kiota.download.token
+      GitHub token for authenticating download requests. Useful for private
+      repositories or to avoid rate limiting. If not set and
+      downloadUseTokenFromEnv is true, the plugin checks the following
+      environment variables in order: GITHUB_TOKEN, GH_TOKEN, KIOTA_TOKEN.
+
+    downloadUseTokenFromEnv (Default: true)
+      User property: kiota.download.useTokenFromEnv
+      Whether to look for a download token in environment variables
+      (GITHUB_TOKEN, GH_TOKEN, KIOTA_TOKEN) when no explicit token
+      is configured. Set to false to disable this behavior.
 ```
 
 ## Quarkus extension
