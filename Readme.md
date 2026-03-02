@@ -121,12 +121,12 @@ Available parameters:
       GitHub token for authenticating download requests. Useful for private
       repositories or to avoid rate limiting. If not set and
       downloadUseTokenFromEnv is true, the plugin checks the following
-      environment variables in order: GITHUB_TOKEN, GH_TOKEN, KIOTA_TOKEN.
+      environment variables in order: GITHUB_TOKEN, GH_TOKEN.
 
     downloadUseTokenFromEnv (Default: true)
       User property: kiota.download.useTokenFromEnv
       Whether to look for a download token in environment variables
-      (GITHUB_TOKEN, GH_TOKEN, KIOTA_TOKEN) when no explicit token
+      (GITHUB_TOKEN, GH_TOKEN) when no explicit token
       is configured. Set to false to disable this behavior.
 ```
 

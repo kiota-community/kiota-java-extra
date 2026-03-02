@@ -5,10 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -33,8 +29,8 @@ class KiotaMojoDownloadTest {
         server.start();
 
         mojo = new KiotaMojo();
-        setField(mojo, "downloadMaxRetries", 2);
-        setField(mojo, "downloadRetryDelayMs", 10L);
+        mojo.downloadMaxRetries = 2;
+        mojo.downloadRetryDelayMs = 10L;
     }
 
     @AfterEach
@@ -50,7 +46,10 @@ class KiotaMojoDownloadTest {
         server.enqueue(new MockResponse().setBody(new Buffer().write(zipBytes)));
 
         String dest = tempDir.resolve("extract").toString();
-        invokeDownloadAndExtract(server.url("/kiota.zip").toString(), dest, "Linux", "amd64");
+        mojo.downloadAndExtract(
+                server.url("/kiota.zip").toString(),
+                dest,
+                new KiotaMojo.KiotaParams("Linux", "amd64"));
 
         assertTrue(new File(dest, "kiota").exists());
         assertEquals(3, server.getRequestCount());
@@ -67,11 +66,10 @@ class KiotaMojoDownloadTest {
                 assertThrows(
                         IllegalStateException.class,
                         () ->
-                                invokeDownloadAndExtract(
+                                mojo.downloadAndExtract(
                                         server.url("/kiota.zip").toString(),
                                         dest,
-                                        "Linux",
-                                        "amd64"));
+                                        new KiotaMojo.KiotaParams("Linux", "amd64")));
 
         assertTrue(
                 ex.getMessage().contains("3 attempt(s)"),
@@ -84,13 +82,13 @@ class KiotaMojoDownloadTest {
 
     @Test
     void downloadFile_noAuthorizationHeaderWhenEnvTokenDisabled() throws Exception {
-        setField(mojo, "downloadUseTokenFromEnv", false);
+        mojo.downloadUseTokenFromEnv = false;
 
         byte[] content = "test content".getBytes();
         server.enqueue(new MockResponse().setBody(new Buffer().write(content)));
 
         File dest = tempDir.resolve("download.zip").toFile();
-        invokeDownloadFile(server.url("/test.zip").toString(), dest);
+        mojo.downloadFile(server.url("/test.zip").toString(), dest);
 
         assertNull(server.takeRequest().getHeader("Authorization"));
     }
@@ -103,48 +101,5 @@ class KiotaMojoDownloadTest {
             zos.closeEntry();
         }
         return baos.toByteArray();
-    }
-
-    private void setField(Object obj, String fieldName, Object value) throws Exception {
-        Field field = obj.getClass().getDeclaredField(fieldName);
-        field.setAccessible(true);
-        field.set(obj, value);
-    }
-
-    private void invokeDownloadFile(String url, File destination) throws Exception {
-        Method method = KiotaMojo.class.getDeclaredMethod("downloadFile", String.class, File.class);
-        method.setAccessible(true);
-        try {
-            method.invoke(mojo, url, destination);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof IOException) {
-                throw (IOException) e.getCause();
-            }
-            throw e;
-        }
-    }
-
-    private void invokeDownloadAndExtract(String url, String dest, String os, String arch)
-            throws Exception {
-        Class<?> kpClass = Class.forName("io.kiota.maven.plugin.KiotaMojo$KiotaParams");
-        Constructor<?> ctor = kpClass.getDeclaredConstructor(String.class, String.class);
-        ctor.setAccessible(true);
-        Object kp = ctor.newInstance(os, arch);
-
-        Method method =
-                KiotaMojo.class.getDeclaredMethod(
-                        "downloadAndExtract", String.class, String.class, kpClass);
-        method.setAccessible(true);
-        try {
-            method.invoke(mojo, url, dest, kp);
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof IllegalStateException) {
-                throw (IllegalStateException) e.getCause();
-            }
-            if (e.getCause() instanceof RuntimeException) {
-                throw (RuntimeException) e.getCause();
-            }
-            throw e;
-        }
     }
 }

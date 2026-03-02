@@ -234,30 +234,30 @@ public class KiotaMojo extends AbstractMojo {
      * Maximum number of retry attempts for downloading the Kiota binary.
      */
     @Parameter(defaultValue = "3", property = "kiota.download.maxRetries")
-    private int downloadMaxRetries;
+    int downloadMaxRetries;
 
     /**
      * Initial delay in milliseconds between download retry attempts.
      * The delay doubles with each subsequent retry (exponential backoff).
      */
     @Parameter(defaultValue = "1000", property = "kiota.download.retryDelayMs")
-    private long downloadRetryDelayMs;
+    long downloadRetryDelayMs;
 
     /**
      * GitHub token for authenticating download requests. Useful for private repositories
      * or to avoid rate limiting. If not set and {@code downloadUseTokenFromEnv} is true,
-     * the plugin checks the GITHUB_TOKEN, GH_TOKEN, and KIOTA_TOKEN environment variables
+     * the plugin checks the GITHUB_TOKEN, GH_TOKEN environment variables
      * in that order.
      */
     @Parameter(property = "kiota.download.token")
     private String downloadToken;
 
     /**
-     * Whether to look for a download token in the GITHUB_TOKEN, GH_TOKEN, and KIOTA_TOKEN
+     * Whether to look for a download token in the GITHUB_TOKEN, GH_TOKEN
      * environment variables when no explicit token is configured.
      */
     @Parameter(defaultValue = "true", property = "kiota.download.useTokenFromEnv")
-    private boolean downloadUseTokenFromEnv;
+    boolean downloadUseTokenFromEnv;
 
     /**
      * The log level of Kiota to use when logging messages to the main output. [default: Warning]
@@ -480,7 +480,7 @@ public class KiotaMojo extends AbstractMojo {
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
 
-    private void downloadAndExtract(String url, String dest, KiotaParams kp) {
+    void downloadAndExtract(String url, String dest, KiotaParams kp) {
         File zipFile = Paths.get(dest, "kiota.zip").toFile();
         File finalDestination = Paths.get(dest, kp.binary()).toFile();
 
@@ -544,7 +544,7 @@ public class KiotaMojo extends AbstractMojo {
         if (!downloadUseTokenFromEnv) {
             return null;
         }
-        for (String envVar : new String[] {"GITHUB_TOKEN", "GH_TOKEN", "KIOTA_TOKEN"}) {
+        for (String envVar : new String[] {"GITHUB_TOKEN", "GH_TOKEN"}) {
             String token = System.getenv(envVar);
             if (token != null && !token.isEmpty()) {
                 return token;
@@ -553,7 +553,7 @@ public class KiotaMojo extends AbstractMojo {
         return null;
     }
 
-    private void downloadFile(String url, File destination) throws IOException {
+    void downloadFile(String url, File destination) throws IOException {
         URL s = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) s.openConnection();
         connection.setInstanceFollowRedirects(true);
@@ -653,7 +653,7 @@ public class KiotaMojo extends AbstractMojo {
         }
     }
 
-    private static class KiotaParams {
+    static class KiotaParams {
 
         private final Os os;
         private final Arch arch;
