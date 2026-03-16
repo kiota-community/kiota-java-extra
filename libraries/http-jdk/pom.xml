@@ -50,7 +50,7 @@
     <dependency>
       <groupId>io.apicurio</groupId>
       <artifactId>apicurio-registry-v2-java-sdk</artifactId>
-      <version>3.1.7</version>
+      <version>3.2.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
