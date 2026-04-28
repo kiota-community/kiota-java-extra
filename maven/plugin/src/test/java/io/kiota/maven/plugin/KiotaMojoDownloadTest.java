@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -91,6 +93,48 @@ class KiotaMojoDownloadTest {
         mojo.downloadFile(server.url("/test.zip").toString(), dest);
 
         assertNull(server.takeRequest().getHeader("Authorization"));
+    }
+
+    @Test
+    void downloadFile_fileUrl_copiesFile() throws Exception {
+        File source = tempDir.resolve("source.zip").toFile();
+        Files.writeString(source.toPath(), "zip-content");
+
+        File dest = tempDir.resolve("dest.zip").toFile();
+        mojo.downloadFile(source.toURI().toString(), dest);
+
+        assertEquals("zip-content", Files.readString(dest.toPath()));
+    }
+
+    @Test
+    void downloadAndExtract_fileUrlZip() throws Exception {
+        byte[] zipBytes = createKiotaZip("kiota");
+        File zipFile = tempDir.resolve("kiota-local.zip").toFile();
+        try (FileOutputStream fos = new FileOutputStream(zipFile)) {
+            fos.write(zipBytes);
+        }
+
+        String dest = tempDir.resolve("extract-file").toString();
+        mojo.downloadAndExtract(
+                zipFile.toURI().toString(),
+                dest,
+                new KiotaMojo.KiotaParams("Linux", "amd64"));
+
+        assertTrue(new File(dest, "kiota").exists());
+    }
+
+    @Test
+    void downloadAndExtract_directHttpZipUrl() throws Exception {
+        byte[] zipBytes = createKiotaZip("kiota");
+        server.enqueue(new MockResponse().setBody(new Buffer().write(zipBytes)));
+
+        String dest = tempDir.resolve("extract-direct").toString();
+        mojo.downloadAndExtract(
+                server.url("/custom-path/kiota-linux-x64.zip").toString(),
+                dest,
+                new KiotaMojo.KiotaParams("Linux", "amd64"));
+
+        assertTrue(new File(dest, "kiota").exists());
     }
 
     private byte[] createKiotaZip(String binaryName) throws IOException {
