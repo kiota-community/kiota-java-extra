@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -15,6 +16,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -34,6 +36,9 @@ import org.apache.maven.project.MavenProject;
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class KiotaMojo extends AbstractMojo {
     private final Log log = new SystemStreamLog();
+
+    private static final String DEFAULT_BASE_URL =
+            "https://github.com/microsoft/kiota/releases/download";
 
     /**
      * Skip the execution of the goal
@@ -66,12 +71,22 @@ public class KiotaMojo extends AbstractMojo {
     private String osArch;
 
     /**
-     * Base URL to be used for the download
+     * Base URL to be used for the download. Must be HTTP or HTTPS.
+     * The plugin appends {@code /v{version}/{artifact}.zip} to this URL.
+     * Mutually exclusive with {@link #downloadURL}.
      */
-    @Parameter(
-            defaultValue = "https://github.com/microsoft/kiota/releases/download",
-            property = "kiota.baseURL")
+    @Parameter(defaultValue = DEFAULT_BASE_URL, property = "kiota.baseURL")
     private String baseURL;
+
+    /**
+     * Full URL to a Kiota distribution zip archive. Supports HTTP, HTTPS, and file:// protocols.
+     * The zip must contain the platform-specific Kiota binary ({@code kiota} or {@code kiota.exe})
+     * at the archive root, matching the layout of the official Kiota release artifacts
+     * (e.g. {@code linux-x64.zip}).
+     * When set, {@link #baseURL} must remain at its default value.
+     */
+    @Parameter(property = "kiota.downloadURL")
+    String downloadURL;
 
     /**
      * Version of Kiota to be used
@@ -296,10 +311,29 @@ public class KiotaMojo extends AbstractMojo {
                     Path.of(targetBinaryFolder.getAbsolutePath(), kiotaVersion)
                             .toFile()
                             .getAbsolutePath();
-            downloadAndExtract(
-                    baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip",
-                    executablePath,
-                    kp);
+
+            if (downloadURL != null && !downloadURL.isEmpty()) {
+                if (!DEFAULT_BASE_URL.equals(baseURL)) {
+                    throw new IllegalArgumentException(
+                            "kiota.downloadURL and kiota.baseURL are mutually exclusive."
+                                    + " Please configure only one of them.");
+                }
+                warnIfInsecureHttp(downloadURL, "kiota.downloadURL");
+                downloadAndExtract(downloadURL, executablePath, kp);
+            } else {
+                if (!baseURL.startsWith("http://") && !baseURL.startsWith("https://")) {
+                    throw new IllegalArgumentException(
+                            "kiota.baseURL must use HTTP or HTTPS protocol. Got: "
+                                    + baseURL
+                                    + ". To use a file:// or full URL, set kiota.downloadURL"
+                                    + " instead.");
+                }
+                warnIfInsecureHttp(baseURL, "kiota.baseURL");
+                downloadAndExtract(
+                        baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip",
+                        executablePath,
+                        kp);
+            }
             executable = Paths.get(executablePath, kp.binary()).toFile().getAbsolutePath();
         }
 
@@ -508,7 +542,6 @@ public class KiotaMojo extends AbstractMojo {
                 return;
             } catch (IOException e) {
                 lastException = e;
-                // Clean up partial downloads
                 zipFile.delete();
                 finalDestination.delete();
 
@@ -539,6 +572,15 @@ public class KiotaMojo extends AbstractMojo {
                 lastException);
     }
 
+    private void warnIfInsecureHttp(String url, String property) {
+        if (url.startsWith("http://")) {
+            log.warn(
+                    property
+                            + " uses plain HTTP, which is vulnerable to interception."
+                            + " Consider using HTTPS instead.");
+        }
+    }
+
     private String resolveDownloadToken() {
         if (downloadToken != null && !downloadToken.isEmpty()) {
             return downloadToken;
@@ -556,6 +598,11 @@ public class KiotaMojo extends AbstractMojo {
     }
 
     void downloadFile(String url, File destination) throws IOException {
+        URI uri = URI.create(url);
+        if ("file".equals(uri.getScheme())) {
+            Files.copy(Path.of(uri), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return;
+        }
         URL s = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) s.openConnection();
         connection.setInstanceFollowRedirects(true);
