@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -15,6 +16,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -296,10 +298,15 @@ public class KiotaMojo extends AbstractMojo {
                     Path.of(targetBinaryFolder.getAbsolutePath(), kiotaVersion)
                             .toFile()
                             .getAbsolutePath();
-            downloadAndExtract(
-                    baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip",
-                    executablePath,
-                    kp);
+            String downloadUrl;
+            URI baseUri = URI.create(baseURL);
+            if ("file".equals(baseUri.getScheme())
+                    || baseURL.toLowerCase(Locale.ROOT).endsWith(".zip")) {
+                downloadUrl = baseURL;
+            } else {
+                downloadUrl = baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip";
+            }
+            downloadAndExtract(downloadUrl, executablePath, kp);
             executable = Paths.get(executablePath, kp.binary()).toFile().getAbsolutePath();
         }
 
@@ -556,6 +563,11 @@ public class KiotaMojo extends AbstractMojo {
     }
 
     void downloadFile(String url, File destination) throws IOException {
+        URI uri = URI.create(url);
+        if ("file".equals(uri.getScheme())) {
+            Files.copy(Path.of(uri), destination.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            return;
+        }
         URL s = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) s.openConnection();
         connection.setInstanceFollowRedirects(true);
