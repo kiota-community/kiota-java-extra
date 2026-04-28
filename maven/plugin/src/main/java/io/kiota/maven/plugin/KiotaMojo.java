@@ -304,13 +304,7 @@ public class KiotaMojo extends AbstractMojo {
                     || baseURL.toLowerCase(Locale.ROOT).endsWith(".zip")) {
                 downloadUrl = baseURL;
             } else {
-                downloadUrl =
-                        baseURL
-                                + "/v"
-                                + kiotaVersion
-                                + "/"
-                                + kp.downloadArtifact()
-                                + ".zip";
+                downloadUrl = baseURL + "/v" + kiotaVersion + "/" + kp.downloadArtifact() + ".zip";
             }
             downloadAndExtract(downloadUrl, executablePath, kp);
             executable = Paths.get(executablePath, kp.binary()).toFile().getAbsolutePath();

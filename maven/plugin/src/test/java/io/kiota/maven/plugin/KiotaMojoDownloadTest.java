@@ -116,9 +116,7 @@ class KiotaMojoDownloadTest {
 
         String dest = tempDir.resolve("extract-file").toString();
         mojo.downloadAndExtract(
-                zipFile.toURI().toString(),
-                dest,
-                new KiotaMojo.KiotaParams("Linux", "amd64"));
+                zipFile.toURI().toString(), dest, new KiotaMojo.KiotaParams("Linux", "amd64"));
 
         assertTrue(new File(dest, "kiota").exists());
     }
