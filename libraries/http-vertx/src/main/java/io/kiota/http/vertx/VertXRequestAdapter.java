@@ -362,7 +362,8 @@ public class VertXRequestAdapter implements RequestAdapter {
                                 && errorMappings.containsKey("4XX"))
                         && !(statusCode >= 500
                                 && statusCode < 600
-                                && errorMappings.containsKey("5XX"))) {
+                                && errorMappings.containsKey("5XX"))
+                        && !errorMappings.containsKey("XXX")) {
             final ApiException result =
                     new ApiExceptionBuilder()
                             .withMessage(

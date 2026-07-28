@@ -1,5 +1,7 @@
+.classpath
 .claude
 .idea
 .project
+.settings
 .vscode
 target
