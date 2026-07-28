@@ -380,8 +380,8 @@ public class VertXRequestAdapter implements RequestAdapter {
                 errorMappings.containsKey(statusCodeAsString)
                         ? errorMappings.get(statusCodeAsString)
                         : (statusCode >= 400 && statusCode < 500
-                                ? errorMappings.get("4XX")
-                                : errorMappings.get("5XX"));
+                            ? errorMappings.getOrDefault("4XX", errorMappings.get("XXX"))
+                            : errorMappings.getOrDefault("5XX", errorMappings.get("XXX")));
         final ParseNode rootNode = getRootParseNode(response);
         if (rootNode == null) {
             final ApiException result =
