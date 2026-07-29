@@ -362,7 +362,8 @@ public class VertXRequestAdapter implements RequestAdapter {
                                 && errorMappings.containsKey("4XX"))
                         && !(statusCode >= 500
                                 && statusCode < 600
-                                && errorMappings.containsKey("5XX"))) {
+                                && errorMappings.containsKey("5XX"))
+                        && !errorMappings.containsKey("XXX")) {
             final ApiException result =
                     new ApiExceptionBuilder()
                             .withMessage(
@@ -379,8 +380,8 @@ public class VertXRequestAdapter implements RequestAdapter {
                 errorMappings.containsKey(statusCodeAsString)
                         ? errorMappings.get(statusCodeAsString)
                         : (statusCode >= 400 && statusCode < 500
-                                ? errorMappings.get("4XX")
-                                : errorMappings.get("5XX"));
+                                ? errorMappings.getOrDefault("4XX", errorMappings.get("XXX"))
+                                : errorMappings.getOrDefault("5XX", errorMappings.get("XXX")));
         final ParseNode rootNode = getRootParseNode(response);
         if (rootNode == null) {
             final ApiException result =
