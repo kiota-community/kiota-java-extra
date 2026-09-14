@@ -43,9 +43,13 @@ public class JsonParseNode implements ParseNode {
     public ParseNode getChildNode(@Nonnull final String identifier) {
         Objects.requireNonNull(identifier, "identifier parameter is required");
         if (currentNode.isObject()) {
+            final JsonNode child = currentNode.get(identifier);
+            if (child == null || child.isNull()) {
+                return null;
+            }
             final Consumer<Parsable> onBefore = this.onBeforeAssignFieldValues;
             final Consumer<Parsable> onAfter = this.onAfterAssignFieldValues;
-            final JsonParseNode node = factory.createJsonParseNode(currentNode.get(identifier));
+            final JsonParseNode node = factory.createJsonParseNode(child);
             node.setOnBeforeAssignFieldValues(onBefore);
             node.setOnAfterAssignFieldValues(onAfter);
             return node;
