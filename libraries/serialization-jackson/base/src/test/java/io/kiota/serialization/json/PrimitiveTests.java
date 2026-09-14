@@ -59,7 +59,8 @@ public class PrimitiveTests {
     @Test
     public void deserializeOffsetDateTimeWithOffset() throws IOException {
         JsonParseNodeFactory factory = new JsonParseNodeFactory();
-        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("\"2024-02-08T12:07:31Z\""));
+        JsonParseNode node =
+                factory.createJsonParseNode(mapper.readTree("\"2024-02-08T12:07:31Z\""));
 
         OffsetDateTime value = node.getOffsetDateTimeValue();
         assertEquals(OffsetDateTime.of(2024, 2, 8, 12, 7, 31, 0, ZoneOffset.UTC), value);
@@ -68,7 +69,8 @@ public class PrimitiveTests {
     @Test
     public void deserializeOffsetDateTimeWithoutOffsetFallsBackToUtc() throws IOException {
         JsonParseNodeFactory factory = new JsonParseNodeFactory();
-        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("\"2024-02-08T12:07:31\""));
+        JsonParseNode node =
+                factory.createJsonParseNode(mapper.readTree("\"2024-02-08T12:07:31\""));
 
         OffsetDateTime value = node.getOffsetDateTimeValue();
         assertEquals(OffsetDateTime.of(2024, 2, 8, 12, 7, 31, 0, ZoneOffset.UTC), value);
