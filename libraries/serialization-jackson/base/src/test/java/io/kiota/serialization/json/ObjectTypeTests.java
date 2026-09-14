@@ -206,8 +206,7 @@ public class ObjectTypeTests {
         // Arrange
         JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                factory.createJsonParseNode(
-                        mapper.readTree("{\"existing\":\"value\"}"));
+                factory.createJsonParseNode(mapper.readTree("{\"existing\":\"value\"}"));
 
         // Act & Assert
         assertNull(node.getChildNode("nonExistentProperty"));
@@ -220,8 +219,7 @@ public class ObjectTypeTests {
         // Arrange
         JsonParseNodeFactory factory = new JsonParseNodeFactory();
         JsonParseNode node =
-                factory.createJsonParseNode(
-                        mapper.readTree("{\"nullProperty\":null}"));
+                factory.createJsonParseNode(mapper.readTree("{\"nullProperty\":null}"));
 
         // Act & Assert
         assertNull(node.getChildNode("nullProperty"));
