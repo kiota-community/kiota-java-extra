@@ -2,11 +2,16 @@ package io.kiota.serialization.json;
 
 import static io.kiota.serialization.json.JsonMapper.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.microsoft.kiota.serialization.SerializationWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import org.junit.jupiter.api.Test;
 
 public class PrimitiveTests {
@@ -49,5 +54,39 @@ public class PrimitiveTests {
         assertEquals(123.0f, floatValue);
         assertEquals(new BigDecimal(123), bigDecValue);
         assertEquals((byte) 123, byteValue);
+    }
+
+    @Test
+    public void deserializeOffsetDateTimeWithOffset() throws IOException {
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("\"2024-02-08T12:07:31Z\""));
+
+        OffsetDateTime value = node.getOffsetDateTimeValue();
+        assertEquals(OffsetDateTime.of(2024, 2, 8, 12, 7, 31, 0, ZoneOffset.UTC), value);
+    }
+
+    @Test
+    public void deserializeOffsetDateTimeWithoutOffsetFallsBackToUtc() throws IOException {
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("\"2024-02-08T12:07:31\""));
+
+        OffsetDateTime value = node.getOffsetDateTimeValue();
+        assertEquals(OffsetDateTime.of(2024, 2, 8, 12, 7, 31, 0, ZoneOffset.UTC), value);
+    }
+
+    @Test
+    public void deserializeOffsetDateTimeInvalidThrowsException() throws IOException {
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("\"not-a-date\""));
+
+        assertThrows(DateTimeParseException.class, () -> node.getOffsetDateTimeValue());
+    }
+
+    @Test
+    public void deserializeOffsetDateTimeNullNodeReturnsNull() throws IOException {
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node = factory.createJsonParseNode(mapper.readTree("null"));
+
+        assertNull(node.getOffsetDateTimeValue());
     }
 }
