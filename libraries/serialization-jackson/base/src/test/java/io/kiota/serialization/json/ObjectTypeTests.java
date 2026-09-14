@@ -2,6 +2,8 @@ package io.kiota.serialization.json;
 
 import static io.kiota.serialization.json.JsonMapper.mapper;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.microsoft.kiota.serialization.AdditionalDataHolder;
 import com.microsoft.kiota.serialization.Parsable;
@@ -197,5 +199,31 @@ public class ObjectTypeTests {
                                         + " string\",\"integer\":1,\"unknownbool\":true}"));
         var objValue = node.getObjectValue(TestObject::createFromDiscriminatorValue);
         assertEquals(true, objValue.getAdditionalData().get("unknownbool"));
+    }
+
+    @Test
+    public void getChildNodeReturnsNullWhenPropertyMissing() throws IOException {
+        // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node =
+                factory.createJsonParseNode(
+                        mapper.readTree("{\"existing\":\"value\"}"));
+
+        // Act & Assert
+        assertNull(node.getChildNode("nonExistentProperty"));
+        assertNull(node.getChildNode("@odata.type"));
+        assertNotNull(node.getChildNode("existing"));
+    }
+
+    @Test
+    public void getChildNodeReturnsNullWhenPropertyIsNull() throws IOException {
+        // Arrange
+        JsonParseNodeFactory factory = new JsonParseNodeFactory();
+        JsonParseNode node =
+                factory.createJsonParseNode(
+                        mapper.readTree("{\"nullProperty\":null}"));
+
+        // Act & Assert
+        assertNull(node.getChildNode("nullProperty"));
     }
 }
