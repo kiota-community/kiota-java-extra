@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -20,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.maven.plugin.AbstractMojo;
@@ -356,7 +358,7 @@ public class KiotaMojo extends AbstractMojo {
                 // TODO: STDERR is not correctly redirected
                 pb.inheritIO();
             }
-            ps = pb.start();
+            ps = startProcess(pb);
             ps.waitFor(kiotaTimeout, TimeUnit.SECONDS);
 
             if (ps.exitValue() != 0) {
@@ -487,8 +489,26 @@ public class KiotaMojo extends AbstractMojo {
         project.addCompileSourceRoot(targetDirectory.getAbsolutePath());
     }
 
+    // Under parallel builds the exec can transiently fail with "Text file busy" (JDK-8068370)
+    Process startProcess(ProcessBuilder pb) throws IOException, InterruptedException {
+        for (int attempt = 1; ; attempt++) {
+            try {
+                return pb.start();
+            } catch (IOException e) {
+                if (attempt == 10) {
+                    throw e;
+                }
+                log.warn("Failed to start Kiota, retrying: " + e.getMessage());
+                Thread.sleep(20L * attempt);
+            }
+        }
+    }
+
     void downloadAndExtract(String url, String dest, KiotaParams kp) {
-        File zipFile = Paths.get(dest, "kiota.zip").toFile();
+        // unique names: executions sharing the folder never touch each other's partial files
+        String unique = UUID.randomUUID().toString();
+        File zipFile = Paths.get(dest, "kiota-" + unique + ".zip").toFile();
+        File tmpBinary = Paths.get(dest, kp.binary() + "-" + unique + ".tmp").toFile();
         File finalDestination = Paths.get(dest, kp.binary()).toFile();
 
         if (finalDestination.exists()) {
@@ -508,16 +528,23 @@ public class KiotaMojo extends AbstractMojo {
                         FileSystems.newFileSystem(
                                 zipFile.toPath(), this.getClass().getClassLoader())) {
                     Path fileToExtract = fileSystem.getPath("/" + kp.binary());
-                    Files.copy(fileToExtract, finalDestination.toPath());
+                    Files.copy(fileToExtract, tmpBinary.toPath());
                 }
-                finalDestination.setExecutable(true, false);
+                tmpBinary.setExecutable(true, false);
+                // same-folder rename: others see either no binary or a complete one
+                try {
+                    Files.move(tmpBinary.toPath(), finalDestination.toPath());
+                } catch (FileAlreadyExistsException e) {
+                    // published concurrently by another execution, which may be running it
+                    tmpBinary.delete();
+                }
                 zipFile.delete();
                 return;
             } catch (IOException e) {
                 lastException = e;
                 // Clean up partial downloads
                 zipFile.delete();
-                finalDestination.delete();
+                tmpBinary.delete();
 
                 if (attempt < maxAttempts) {
                     long delay = Math.min(downloadRetryDelayMs * (1L << (attempt - 1)), 256_000L);

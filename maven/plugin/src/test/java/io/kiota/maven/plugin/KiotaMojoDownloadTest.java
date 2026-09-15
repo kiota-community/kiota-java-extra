@@ -8,6 +8,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import okhttp3.mockwebserver.MockResponse;
@@ -80,6 +85,48 @@ class KiotaMojoDownloadTest {
                 ex.getCause().getMessage().contains("HTTP 404"),
                 "Expected HTTP 404 in cause: " + ex.getCause().getMessage());
         assertEquals(3, server.getRequestCount());
+        assertArrayEquals(new String[0], new File(dest).list(), "no leftover partial files");
+    }
+
+    @Test
+    void downloadAndExtract_concurrentExecutionsShareFolder() throws Exception {
+        mojo.downloadMaxRetries = 0;
+        Path zipFile = tempDir.resolve("kiota-local.zip");
+        Files.write(zipFile, createKiotaZip("kiota"));
+        String url = zipFile.toUri().toString();
+        String dest = tempDir.resolve("shared").toString();
+        KiotaMojo.KiotaParams kp = new KiotaMojo.KiotaParams("Linux", "amd64");
+
+        Callable<Void> task =
+                () -> {
+                    mojo.downloadAndExtract(url, dest, kp);
+                    return null;
+                };
+        ExecutorService executor = Executors.newFixedThreadPool(8);
+        try {
+            for (Future<Void> future : executor.invokeAll(Collections.nCopies(8, task))) {
+                future.get();
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+
+        assertEquals("#!/bin/sh\necho kiota", Files.readString(Path.of(dest, "kiota")));
+        assertArrayEquals(new String[] {"kiota"}, new File(dest).list());
+    }
+
+    @Test
+    void downloadAndExtract_keepsExistingBinary() throws Exception {
+        Path dest = tempDir.resolve("existing");
+        Files.createDirectories(dest);
+        Files.writeString(dest.resolve("kiota"), "my local kiota build");
+
+        mojo.downloadAndExtract(
+                tempDir.resolve("missing.zip").toUri().toString(),
+                dest.toString(),
+                new KiotaMojo.KiotaParams("Linux", "amd64"));
+
+        assertEquals("my local kiota build", Files.readString(dest.resolve("kiota")));
     }
 
     @Test
